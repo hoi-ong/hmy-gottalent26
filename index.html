@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chấm điểm cuộc thi</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+:root{--primary:#b91c1c;--primary-d:#7f1d1d;--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--ok:#15803d;--warn:#b45309;--r:12px}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.45;font-size:15px}
+header{background:var(--primary);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+header h1{font-size:1.05rem;margin:0;flex:1 1 auto}
+header select,header a.btn{font:inherit;padding:7px 10px;border-radius:8px;border:none;background:#fff;color:var(--text);text-decoration:none}
+header a.btn{background:var(--primary-d);color:#fff}
+main{max-width:1100px;margin:0 auto;padding:14px}
+.banner{background:#fff7ed;border:1px solid #fed7aa;color:var(--warn);padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:.9rem}
+.msg{padding:24px;text-align:center;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
+.card:active{transform:scale(.99)}
+.num{display:inline-block;background:var(--primary);color:#fff;border-radius:6px;padding:1px 8px;font-size:.8rem;font-weight:600}
+.card h3{margin:8px 0 2px;font-size:1rem}
+.sub{color:var(--muted);font-size:.85rem}
+.status{margin-top:10px;font-size:.85rem;font-weight:600}
+.ok{color:var(--ok)} .todo{color:var(--muted)}
+.back{background:none;border:none;color:var(--primary);font:inherit;font-weight:600;padding:6px 0;cursor:pointer}
+.crit{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px}
+.crit-title{font-weight:700;margin-bottom:8px}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.lv{border:1.5px solid var(--border);background:#fff;border-radius:10px;padding:9px;text-align:left;font:inherit;cursor:pointer;color:var(--text)}
+.lv b{display:block;font-size:.9rem}
+.lv small{display:block;color:var(--muted);font-size:.75rem;margin-top:3px;line-height:1.3}
+.lv.sel{border-color:var(--primary);background:#fef2f2}
+.lv.sel b{color:var(--primary)}
+textarea{width:100%;min-height:80px;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff}
+.total{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 14px;margin:0 -14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.total strong{font-size:1.2rem;color:var(--primary)}
+.btn-main{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:11px 18px;font:inherit;font-weight:600;cursor:pointer}
+.btn-main:disabled{background:#d1d5db;cursor:not-allowed}
+.btn-sec{background:#fff;border:1px solid var(--border);border-radius:10px;padding:9px 14px;font:inherit;cursor:pointer}
+.table-wrap{overflow-x:auto;background:var(--card);border-radius:var(--r);border:1px solid var(--border)}
+table{border-collapse:collapse;width:100%;min-width:800px;font-size:.88rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap}
+th{background:#f9fafb;font-size:.8rem;color:var(--muted)}
+td.l,th.l{text-align:left;white-space:normal;min-width:180px}
+tr.top td{background:#fefce8}
+.tot{font-weight:700;color:var(--primary)}
+.partial{color:var(--warn);font-size:.75rem}
+details{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:8px}
+summary{cursor:pointer;font-weight:600}
+.jrow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);font-size:.9rem;flex-wrap:wrap}
+.jrow em{color:var(--muted);font-style:normal;flex-basis:100%}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:99}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏆 Chấm điểm cuộc thi</h1>
+  <select id="judgeSel" aria-label="Chọn giám khảo"></select>
+  <a class="btn" href="#admin">Tổng hợp</a>
+</header>
+
+<main>
+  <div id="banner" class="banner" hidden>
+    ⚠️ Chưa cấu hình Firebase: dữ liệu chỉ lưu trên trình duyệt này (chế độ thử nghiệm). Xem hướng dẫn để đưa lên chế độ chung.
+  </div>
+  <div id="view"></div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   1. CẤU HÌNH — chỉnh tại đây
+   ========================================================= */
+
+// Dán cấu hình Firebase vào đây (xem hướng dẫn bên dưới). Để trống = chế độ thử nghiệm.
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDQLIfZ_sZYR8uRK0qD7hmosuQWrTj9vMA",
+  authDomain: "hmy-gottalent.firebaseapp.com",
+  databaseURL: "https://hmy-gottalent-default-rtdb.asia-southeast1.firebasedatabase.app",   // ví dụ: "https://ten-du-an-default-rtdb.asia-southeast1.firebasedatabase.app"
+  projectId: "hmy-gottalent"
+};
+
+// Mật khẩu xem trang tổng hợp (thư ký). Đổi trước khi dùng.
+const ADMIN_PIN = "0004";
+
+const JUDGES = [
+  { id: "gk1", name: "Giám khảo 1" },
+  { id: "gk2", name: "Giám khảo 2" },
+  { id: "gk3", name: "Giám khảo 3" }
+];
+
+const PERFORMANCES = [
+  { id: 1,  title: "Quyền Năng Sáng Tạo",        sub: "Giô-suê" },
+  { id: 2,  title: "Who am I?",                  sub: "Thùy Linh - Phước Nguyên" },
+  { id: 3,  title: "Bức Tranh Kỉ Niệm",          sub: "Áp-ra-ham" },
+  { id: 4,  title: "Chiếc Gương",                sub: "Tamca trên Sampa" },
+  { id: 5,  title: "Thế Hệ Đấng Christ",         sub: "Giê-rê-mi" },
+  { id: 6,  title: "Đầu Phục Trước Chúa",        sub: "Thy Thy - Xuân Trọng" },
+  { id: 7,  title: "Thoát Kén",                  sub: "Phi-e-rơ" },
+  { id: 8,  title: "A Story Told Through Light", sub: "Giô-sép" },
+  { id: 9,  title: "Xin Chúa Cứu Gia Đình Con",  sub: "Minh Toàn" },
+  { id: 10, title: "Chúa Là Trung Tâm",          sub: "Nô-ê" }
+];
+
+// 5 tiêu chí × 4 mức (Tốt=4, Khá=3, Đạt=2, Chưa đạt=1) → tối đa 20 điểm
+const LEVELS = ["Tốt", "Khá", "Đạt", "Chưa đạt"];
+const CRITERIA = [
+  { key: "thongdiep", name: "Thông điệp", desc: [
+      "Thông điệp rõ ràng, sâu sắc, và tạo cảm xúc.",
+      "Thông điệp rõ, phù hợp và có ý nghĩa.",
+      "Có thông điệp nhưng còn đơn giản.",
+      "Thông điệp chưa rõ hoặc chưa phù hợp."] },
+  { key: "chuyenmon", name: "Chuyên môn theo thể loại", desc: [
+      "Thực hiện thành thạo, chính xác; làm chủ kỹ năng đặc trưng; ít hoặc không có lỗi.",
+      "Thực hiện tốt phần lớn yêu cầu; vài lỗi nhỏ, không ảnh hưởng nhiều.",
+      "Hoàn thành nhưng còn khá nhiều lỗi hoặc hạn chế kỹ thuật.",
+      "Chưa thực hiện được các yêu cầu cơ bản của tiết mục."] },
+  { key: "trinhdien", name: "Kỹ năng trình diễn", desc: [
+      "Tự tin, biểu cảm tốt, làm chủ sân khấu và thu hút khán giả.",
+      "Tự tin, thể hiện tốt nhưng đôi lúc chưa ổn định.",
+      "Hoàn thành phần trình diễn nhưng còn thiếu tự tin/biểu cảm.",
+      "Lúng túng, thiếu tự tin, chưa làm chủ sân khấu."] },
+  { key: "ydan", name: "Ý tưởng và dàn dựng", desc: [
+      "Sáng tạo, ấn tượng; dàn dựng, đạo cụ, phục trang phù hợp và nổi bật.",
+      "Ý tưởng rõ ràng, có đầu tư; dàn dựng, đạo cụ, phục trang phù hợp.",
+      "Ý tưởng đơn giản; dàn dựng, đạo cụ, phục trang cơ bản.",
+      "Ý tưởng/dàn dựng chưa rõ; đạo cụ, phục trang chưa phù hợp."] },
+  { key: "tuongtac", name: "Tương tác", desc: [
+      "Phối hợp rất tốt, các thành viên đều có vai trò và hỗ trợ nhau. (Cá nhân: kết nối tốt với khán giả)",
+      "Phối hợp tốt, đa số thành viên tham gia tích cực. (Cá nhân: có kết nối, tạo được sự chú ý)",
+      "Có sự phối hợp nhưng chưa đồng đều. (Cá nhân: tương tác còn hạn chế)",
+      "Phối hợp thiếu ăn ý, ảnh hưởng chất lượng. (Cá nhân: thiếu kết nối với khán giả)"] }
+];
+const MAX_TOTAL = CRITERIA.length * 4;
+
+/* =========================================================
+   2. LƯU TRỮ (Firebase nếu có cấu hình, ngược lại localStorage)
+   ========================================================= */
+const useFirebase = !!FIREBASE_CONFIG.databaseURL;
+let db = null;
+if (useFirebase) {
+  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
+}
+const LOCAL_KEY = "contest_scores_v1";
+
+function subscribe(cb) {
+  if (useFirebase) {
+    db.ref("scores").on("value", snap => cb(snap.val() || {}));
+  } else {
+    const load = () => cb(JSON.parse(localStorage.getItem(LOCAL_KEY) || "{}"));
+    load();
+    window.addEventListener("storage", load);
+    window.addEventListener("local-save", load);
+  }
+}
+
+function saveScore(perfId, judgeId, data) {
+  if (useFirebase) return db.ref(`scores/${perfId}/${judgeId}`).set(data);
+  const all = JSON.parse(localStorage.getItem(LOCAL_KEY) || "{}");
+  all[perfId] = all[perfId] || {};
+  all[perfId][judgeId] = data;
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(all));
+  window.dispatchEvent(new Event("local-save"));
+  return Promise.resolve();
+}
+
+/* =========================================================
+   3. TRẠNG THÁI & TIỆN ÍCH
+   ========================================================= */
+const state = {
+  judge: localStorage.getItem("judge_id") || "",
+  perf: null,          // id tiết mục đang chấm
+  draft: {},           // điểm đang nhập
+  all: {},             // toàn bộ điểm từ server
+  adminOK: false
+};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = n => n == null ? "—" : (Math.round(n * 100) / 100).toString();
+const toast = msg => {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1800);
+};
+const totalOf = d => CRITERIA.every(c => d[c.key]) ? CRITERIA.reduce((a, c) => a + d[c.key], 0) : null;
+
+/* =========================================================
+   4. GIAO DIỆN GIÁM KHẢO
+   ========================================================= */
+function renderJudgeSelect() {
+  $("#judgeSel").innerHTML =
+    `<option value="">-- Chọn giám khảo --</option>` +
+    JUDGES.map(j => `<option value="${j.id}">${esc(j.name)}</option>`).join("");
+  $("#judgeSel").value = state.judge;
+}
+
+function renderList() {
+  const cards = PERFORMANCES.map(p => {
+    const s = state.all[p.id]?.[state.judge];
+    const judgesDone = Object.keys(state.all[p.id] || {}).length;
+    const status = s
+      ? `<div class="status ok">✔ Đã chấm: ${s.total}/${MAX_TOTAL}</div>`
+      : `<div class="status todo">Chưa chấm</div>`;
+    return `<button class="card" data-open="${p.id}">
+      <span class="num">#${p.id}</span>
+      <h3>${esc(p.title)}</h3>
+      <div class="sub">${esc(p.sub)}</div>
+      ${status}
+      <div class="sub" style="margin-top:4px">Đã có ${judgesDone}/${JUDGES.length} giám khảo chấm</div>
+    </button>`;
+  }).join("");
+  return `<div class="grid">${cards}</div>`;
+}
+
+function renderForm() {
+  const p = PERFORMANCES.find(x => x.id === state.perf);
+  const d = state.draft;
+  const total = totalOf(d);
+  const blocks = CRITERIA.map(c => `
+    <div class="crit">
+      <div class="crit-title">${esc(c.name)}</div>
+      <div class="levels">
+        ${LEVELS.map((lv, i) => {
+          const score = 4 - i;
+          return `<button class="lv ${d[c.key] === score ? "sel" : ""}"
+                    data-key="${c.key}" data-score="${score}">
+                    <b>${lv} · ${score}đ</b>
+                    <small>${esc(c.desc[i])}</small>
+                  </button>`;
+        }).join("")}
+      </div>
+    </div>`).join("");
+
+  return `
+    <button class="back" data-back>← Danh sách tiết mục</button>
+    <h2 style="margin:4px 0 2px">#${p.id} · ${esc(p.title)}</h2>
+    <div class="sub" style="margin-bottom:12px">${esc(p.sub)}</div>
+    ${blocks}
+    <div class="crit">
+      <div class="crit-title">Nhận xét (không bắt buộc)</div>
+      <textarea id="nx" placeholder="Ghi nhận xét cho tiết mục...">${esc(d.nhanxet || "")}</textarea>
+    </div>
+    <div class="total">
+      <div>Tổng điểm: <strong>${total ?? "—"}</strong> / ${MAX_TOTAL}</div>
+      <button class="btn-main" data-save ${total == null ? "disabled" : ""}>Lưu điểm</button>
+    </div>`;
+}
+
+function renderJudge() {
+  if (!state.judge) {
+    $("#view").innerHTML = `<div class="msg">Vui lòng chọn tên giám khảo ở góc trên.</div>`;
+    return;
+  }
+  $("#view").innerHTML = state.perf == null ? renderList() : renderForm();
+}
+
+function openPerf(id) {
+  state.perf = id;
+  state.draft = { ...(state.all[id]?.[state.judge] || {}) };
+  render();
+  window.scrollTo(0, 0);
+}
+
+/* =========================================================
+   5. GIAO DIỆN THƯ KÝ (TỔNG HỢP)
+   ========================================================= */
+function computeRows() {
+  const rows = PERFORMANCES.map(p => {
+    const per = JUDGES.map(j => ({ ...j, s: state.all[p.id]?.[j.id] || null }));
+    const done = per.filter(x => x.s);
+    const avg = k => done.length ? done.reduce((a, x) => a + x.s[k], 0) / done.length : null;
+    const crit = {};
+    CRITERIA.forEach(c => crit[c.key] = avg(c.key));
+    return { p, per, done, crit, total: avg("total") };
+  });
+  // xếp hạng (ranking chuẩn: bằng điểm → cùng hạng)
+  rows.forEach(r => {
+    r.rank = r.total == null ? null : 1 + rows.filter(o => o.total != null && o.total > r.total).length;
+  });
+  return rows;
+}
+
+function renderAdmin() {
+  if (!state.adminOK) {
+    const pin = prompt("Nhập mật khẩu thư ký:");
+    if (pin !== ADMIN_PIN) {
+      location.hash = "";
+      return "";
+    }
+    state.adminOK = true;
+  }
+  const rows = computeRows();
+  const body = rows.map(r => `
+    <tr class="${r.rank === 1 && r.total != null ? "top" : ""}">
+      <td>${r.rank ?? "—"}</td>
+      <td>${r.p.id}</td>
+      <td class="l"><b>${esc(r.p.title)}</b><br><span class="sub">${esc(r.p.sub)}</span></td>
+      ${CRITERIA.map(c => `<td>${fmt(r.crit[c.key])}</td>`).join("")}
+      <td class="tot">${fmt(r.total)}</td>
+      <td>${r.done.length}/${JUDGES.length}
+        ${r.done.length && r.done.length < JUDGES.length ? `<div class="partial">chưa đủ</div>` : ""}</td>
+    </tr>`).join("");
+
+  const details = rows.map(r => `
+    <details>
+      <summary>#${r.p.id} · ${esc(r.p.title)} — TB ${fmt(r.total)}/${MAX_TOTAL}</summary>
+      ${r.per.map(x => `
+        <div class="jrow">
+          <span><b>${esc(x.name)}</b></span>
+          <span>${x.s ? `${x.s.total}/${MAX_TOTAL}` : "<span class='todo'>Chưa chấm</span>"}</span>
+          ${x.s?.nhanxet ? `<em>“${esc(x.s.nhanxet)}”</em>` : ""}
+        </div>`).join("")}
+    </details>`).join("");
+
+  return `
+    <div class="toolbar">
+      <h2 style="margin:0">Tổng hợp điểm</h2>
+      <button class="btn-sec" data-export>⬇ Xuất CSV</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Hạng</th><th>STT</th><th class="l">Tiết mục</th>
+          ${CRITERIA.map(c => `<th>${esc(c.name)}<br>(/4)</th>`).join("")}
+          <th>TB /${MAX_TOTAL}</th><th>GK</th>
+        </tr></thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>
+    <h3 style="margin:20px 0 8px">Chi tiết từng giám khảo & nhận xét</h3>
+    ${details}`;
+}
+
+function exportCSV() {
+  const rows = computeRows();
+  const header = ["Hạng", "STT", "Tiết mục", "Tác giả", ...CRITERIA.map(c => c.name + " (TB/4)"),
+                  "Tổng TB", "Số GK đã chấm", ...JUDGES.map(j => j.name + " tổng")];
+  const lines = rows.map(r => [
+    r.rank ?? "", r.p.id, r.p.title, r.p.sub,
+    ...CRITERIA.map(c => fmt(r.crit[c.key])),
+    fmt(r.total), r.done.length,
+    ...r.per.map(x => x.s ? x.s.total : "")
+  ]);
+  const csv = [header, ...lines]
+    .map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+    .join("\n");
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "tong_hop_diem.csv";
+  a.click();
+}
+
+/* =========================================================
+   6. ĐIỀU KHIỂN CHUNG
+   ========================================================= */
+function render() {
+  const isAdmin = location.hash === "#admin";
+  $("#judgeSel").parentElement; // giữ header
+  $("#judgeSel").style.display = isAdmin ? "none" : "";
+  $("header h1").textContent = isAdmin ? "📊 Thư ký — Tổng hợp" : "🏆 Chấm điểm cuộc thi";
+  $("header a.btn").textContent = isAdmin ? "← Giám khảo" : "Tổng hợp";
+  $("header a.btn").href = isAdmin ? "#" : "#admin";
+
+  if (isAdmin) {
+    $("#view").innerHTML = renderAdmin();
+  } else {
+    renderJudge();
+  }
+}
+
+document.addEventListener("click", e => {
+  const open = e.target.closest("[data-open]");
+  if (open) return openPerf(Number(open.dataset.open));
+
+  if (e.target.closest("[data-back]")) {
+    state.perf = null; state.draft = {}; render(); window.scrollTo(0, 0); return;
+  }
+
+  const lv = e.target.closest(".lv");
+  if (lv) {
+    const key = lv.dataset.key, score = Number(lv.dataset.score);
+    state.draft[key] = score;
+    const nx = $("#nx")?.value; if (nx != null) state.draft.nhanxet = nx;
+    render(); return;
+  }
+
+  if (e.target.closest("[data-save]")) {
+    const d = state.draft;
+    const total = totalOf(d);
+    if (total == null) return;
+    const payload = {
+      ...CRITERIA.reduce((o, c) => (o[c.key] = d[c.key], o), {}),
+      nhanxet: $("#nx")?.value.trim() || "",
+      total,
+      judgeName: JUDGES.find(j => j.id === state.judge)?.name || state.judge,
+      updatedAt: new Date().toISOString()
+    };
+    saveScore(state.perf, state.judge, payload).then(() => {
+      toast("✔ Đã lưu điểm");
+      state.perf = null; state.draft = {}; render(); window.scrollTo(0, 0);
+    }).catch(err => {
+      console.error(err); toast("Lỗi lưu, thử lại");
+    });
+    return;
+  }
+
+  if (e.target.closest("[data-export]")) exportCSV();
+});
+
+// Ghi nhận xét khi gõ (không re-render để khỏi mất con trỏ)
+document.addEventListener("input", e => {
+  if (e.target.id === "nx") state.draft.nhanxet = e.target.value;
+});
+
+$("#judgeSel").addEventListener("change", e => {
+  state.judge = e.target.value;
+  localStorage.setItem("judge_id", state.judge);
+  state.perf = null; state.draft = {};
+  render();
+});
+
+window.addEventListener("hashchange", () => {
+  state.adminOK = state.adminOK && location.hash === "#admin";
+  render();
+});
+
+/* =========================================================
+   7. KHỞI ĐỘNG
+   ========================================================= */
+$("#banner").hidden = useFirebase;
+renderJudgeSelect();
+subscribe(all => {
+  state.all = all || {};
+  // Khi đang nhập điểm ở form thì không re-render, tránh mất dữ liệu đang gõ
+  if (location.hash === "#admin" || state.perf == null) render();
+});
+</script>
+</body>
+</html>
