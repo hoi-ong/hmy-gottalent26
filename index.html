@@ -38,6 +38,7 @@ main{max-width:1100px;margin:0 auto;padding:14px}
 .msg{padding:28px;text-align:center;color:var(--muted);font-size:1.1rem}
 .sub{color:var(--muted);font-size:.95rem}
 .ok{color:#4ade80}.todo{color:var(--muted)}
+.partial{color:#fdba74}
 
 /* ===== LIST ===== */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
@@ -48,41 +49,56 @@ main{max-width:1100px;margin:0 auto;padding:14px}
 .card h3{margin:8px 0 2px;font-size:1.15rem}
 .status{margin-top:10px;font-size:1rem;font-weight:700}
 .back{background:none;border:none;color:var(--primary);font:inherit;font-weight:700;padding:8px 0;cursor:pointer;font-size:1rem}
+.ptitle{margin:4px 0 2px;font-size:1.4rem}
 
-/* ===== BANDS ===== */
+/* ===== BADGE & DISPLAY ===== */
 .badge{display:inline-block;background:var(--bc);color:#111;font-weight:800;padding:3px 10px;border-radius:8px;font-size:.95rem}
-
-/* ===== SCORING ===== */
 .display{background:var(--card);border:3px solid var(--bc,var(--border));border-radius:var(--r);
-  padding:14px;text-align:center;margin-bottom:14px}
-.display .big{font-size:4rem;font-weight:900;line-height:1;color:var(--bc,var(--text))}
-.display .big span{font-size:1.4rem;color:var(--muted);font-weight:700}
-.display .blabel{margin-top:8px}
+  padding:12px;text-align:center;margin-bottom:14px}
+.display .big{font-size:3.2rem;font-weight:900;line-height:1.05;color:var(--bc,var(--text))}
+.display .big span{font-size:1.2rem;color:var(--muted);font-weight:700}
+.display.small .big{font-size:2.6rem}
+.display .blabel{margin-top:6px}
+
+/* ===== TOGGLE ===== */
+.toggle{display:flex;align-items:center;gap:10px;font-size:1.05rem;font-weight:700;margin:6px 0 12px;cursor:pointer}
+.toggle input{width:24px;height:24px;cursor:pointer}
+
+/* ===== CRITERIA SECTIONS ===== */
 .section{background:var(--card);border:1px solid var(--border);border-left:8px solid var(--c,var(--border));
   border-radius:var(--r);padding:14px;margin-bottom:14px}
-.section-title{font-weight:800;font-size:1.05rem;margin-bottom:10px}
+.section-title{font-weight:800;font-size:1.1rem;margin-bottom:10px}
+.ctag{display:inline-block;background:var(--c);color:#111;border-radius:8px;padding:1px 9px;margin-right:6px;font-size:1rem}
+
+/* ===== SCORE BUTTONS 1–20 ===== */
 .scores{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.sc{font:inherit;font-size:1.6rem;font-weight:900;border-radius:12px;padding:14px 0;cursor:pointer;
-  border:3px solid var(--bc);background:var(--field);color:var(--text);min-height:64px}
+.sc{font:inherit;font-size:1.5rem;font-weight:900;border-radius:12px;padding:12px 0;cursor:pointer;
+  border:3px solid var(--bc);background:var(--field);color:var(--text);min-height:60px}
 .sc.sel{background:var(--bc);color:#111;box-shadow:0 0 0 3px var(--text) inset}
-.hints{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
-.hint{border-radius:12px;padding:10px;background:var(--bc);color:#111;opacity:.55;text-align:center}
-.hint b{display:block;font-size:1.05rem}
-.hint small{font-size:.95rem;font-weight:700}
+
+/* ===== GHI CHÚ NHẮC BÀI (4 mức) ===== */
+.hints{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:12px}
+.hint{border-radius:12px;padding:10px;background:var(--bc);color:#111;opacity:.5;text-align:left}
+.hint b{display:block;font-size:1rem;margin-bottom:3px}
+.hint small{font-size:.92rem;font-weight:600;line-height:1.35;display:block}
 .hint.on{opacity:1;box-shadow:0 0 0 3px var(--text)}
 
-textarea,input[type=text]{width:100%;border:2px solid var(--border);border-radius:10px;padding:12px;font:inherit;
-  background:var(--field);color:var(--text);font-size:1rem}
-.notes-add{display:flex;gap:8px;margin-bottom:8px}
+/* ===== NOTES ===== */
+.notes{margin-top:14px;border-top:1px dashed var(--border);padding-top:12px}
+.notes-title{font-weight:800;margin-bottom:8px}
+.notes-add{display:flex;gap:8px;margin-bottom:6px}
 .notes-add input{flex:1}
-.note{display:flex;gap:8px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--field);margin-top:6px;font-size:1rem}
+input[type=text],textarea{width:100%;border:2px solid var(--border);border-radius:10px;padding:11px;font:inherit;
+  background:var(--field);color:var(--text);font-size:1rem}
+.note{display:flex;gap:8px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--field);margin-top:6px}
 .note .ntext{flex:1;cursor:pointer}
 .note.done .ntext{text-decoration:line-through;opacity:.6}
 .note button{background:none;border:none;color:inherit;font-size:1.1rem;cursor:pointer;padding:0 6px}
 
+/* ===== BOTTOM BAR & BUTTONS ===== */
 .total{position:sticky;bottom:0;background:var(--card);border-top:3px solid var(--primary);padding:12px 14px;
   margin:0 -14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.total strong{font-size:1.4rem;color:var(--primary)}
+.total strong{font-size:1.3rem;color:var(--primary)}
 .btn-main{background:var(--primary);color:var(--primary-text);border:none;border-radius:12px;padding:13px 20px;
   font:inherit;font-weight:800;cursor:pointer;font-size:1.05rem}
 .btn-main:disabled{opacity:.4;cursor:not-allowed}
@@ -99,18 +115,21 @@ textarea,input[type=text]{width:100%;border:2px solid var(--border);border-radiu
 .pod .score{font-size:2.2rem;font-weight:900;color:var(--c);margin-top:6px}
 .pod .score span{font-size:1rem;color:var(--muted);font-weight:700}
 .table-wrap{overflow-x:auto;background:var(--card);border-radius:var(--r);border:1px solid var(--border)}
-table{border-collapse:collapse;width:100%;min-width:760px;font-size:.95rem}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:.95rem}
 th,td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap}
 th{background:var(--field);font-size:.85rem}
+th.ch{background:var(--c);color:#111}
 td.l,th.l{text-align:left;white-space:normal;min-width:180px}
 tr.top td{background:var(--top)}
 .tot{font-weight:900;color:var(--primary);font-size:1.1rem}
 details{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:8px}
 summary{cursor:pointer;font-weight:700}
-.jrow{padding:10px 0;border-bottom:1px dashed var(--border);font-size:.95rem}
+.jrow{padding:12px 0;border-bottom:1px dashed var(--border);font-size:.95rem}
 .jrow .head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.jrow em{display:block;color:var(--muted);font-style:normal;margin-top:4px}
-.nlist{margin:6px 0 0;padding-left:0;list-style:none}
+.cs{display:inline-block;margin:4px 10px 0 0;font-size:.9rem}
+.jrow em{display:block;color:var(--muted);font-style:normal;margin-top:6px}
+.nh{font-weight:700;margin-top:8px;font-size:.92rem}
+.nlist{margin:2px 0 0;padding-left:0;list-style:none}
 .nlist li{padding:2px 0}
 .nlist li.done{text-decoration:line-through;opacity:.6}
 
@@ -142,6 +161,9 @@ summary{cursor:pointer;font-weight:700}
 <div id="toast"></div>
 
 <script>
+/* =========================================================
+   1. CẤU HÌNH
+   ========================================================= */
 
 // Dán cấu hình Firebase vào đây (xem hướng dẫn bên dưới). Để trống = chế độ thử nghiệm.
 const FIREBASE_CONFIG = {
@@ -150,7 +172,6 @@ const FIREBASE_CONFIG = {
   databaseURL: "https://hmy-gottalent-default-rtdb.asia-southeast1.firebasedatabase.app",   // ví dụ: "https://ten-du-an-default-rtdb.asia-southeast1.firebasedatabase.app"
   projectId: "hmy-gottalent"
 };
-
 const ADMIN_PIN = "1234";   // Đổi trước khi dùng
 
 const JUDGES = [
@@ -172,22 +193,71 @@ const PERFORMANCES = [
   { id: 10, title: "Chúa Là Trung Tâm",          sub: "Nô-ê" }
 ];
 
-// Thang điểm 1–20 và 4 mức xếp loại (màu hiển thị theo mức)
+// Thang điểm 1–20 cho mỗi tiêu chí
 const MAX_SCORE = 20;
+const SCORE_LIST = Array.from({ length: MAX_SCORE }, (_, i) => i + 1);
+
+// 4 mức xếp loại, mỗi mức có màu riêng
 const BANDS = [
   { name: "Tốt",      min: 17, max: 20, color: "#22c55e", range: "17 – 20 điểm" },
   { name: "Khá",      min: 10, max: 16, color: "#60a5fa", range: "10 – 16 điểm" },
   { name: "Đạt",      min: 5,  max: 9,  color: "#facc15", range: "5 – 9 điểm"   },
   { name: "Chưa đạt", min: 1,  max: 4,  color: "#f87171", range: "1 – 4 điểm"   }
 ];
-const bandOf = s => s == null ? null : BANDS.find(b => s >= b.min && s <= b.max) || null;
-const SCORE_LIST = Array.from({ length: MAX_SCORE }, (_, i) => i + 1);
+const bandOf = s => (s == null ? null : (BANDS.find(b => s >= b.min && s <= b.max) || null));
+
+// 5 tiêu chí theo tài liệu. desc = 4 mô tả (Tốt, Khá, Đạt, Chưa đạt).
+// Tương tác có thêm descSolo cho tiết mục cá nhân.
+const CRITERIA = [
+  { key: "thongdiep", name: "Thông điệp", color: "#c084fc",
+    desc: [
+      "Thông điệp rõ ràng, sâu sắc, và tạo cảm xúc.",
+      "Thông điệp rõ, phù hợp và có ý nghĩa.",
+      "Có thông điệp nhưng còn đơn giản.",
+      "Thông điệp chưa rõ hoặc chưa phù hợp."
+    ] },
+  { key: "chuyenmon", name: "Chuyên môn theo thể loại", color: "#fb923c",
+    desc: [
+      "Thực hiện thành thạo, chính xác; làm chủ kỹ năng đặc trưng của tiết mục; ít hoặc không có lỗi.",
+      "Thực hiện tốt phần lớn yêu cầu; có một vài lỗi nhỏ nhưng không ảnh hưởng nhiều.",
+      "Hoàn thành được tiết mục nhưng còn khá nhiều lỗi hoặc hạn chế về kỹ thuật.",
+      "Chưa thực hiện được các yêu cầu cơ bản của tiết mục."
+    ] },
+  { key: "trinhdien", name: "Kỹ năng trình diễn", color: "#f472b6",
+    desc: [
+      "Tự tin, biểu cảm tốt, làm chủ sân khấu và thu hút khán giả.",
+      "Tự tin, thể hiện tốt nhưng đôi lúc chưa ổn định.",
+      "Có thể hoàn thành phần trình diễn nhưng còn thiếu tự tin/biểu cảm.",
+      "Lúng túng, thiếu tự tin, chưa làm chủ sân khấu."
+    ] },
+  { key: "ydan", name: "Ý tưởng và dàn dựng", color: "#2dd4bf",
+    desc: [
+      "Sáng tạo, ấn tượng; dàn dựng, đạo cụ, phục trang phù hợp và nổi bật.",
+      "Ý tưởng rõ ràng, có đầu tư; dàn dựng, đạo cụ, phục trang phù hợp.",
+      "Ý tưởng đơn giản; dàn dựng, đạo cụ, phục trang cơ bản.",
+      "Ý tưởng/dàn dựng chưa rõ; đạo cụ, phục trang chưa phù hợp."
+    ] },
+  { key: "tuongtac", name: "Tương tác", color: "#a3e635",
+    desc: [
+      "Phối hợp rất tốt, các thành viên đều có vai trò và hỗ trợ nhau.",
+      "Phối hợp tốt, đa số thành viên tham gia tích cực.",
+      "Có sự phối hợp nhưng chưa đồng đều.",
+      "Phối hợp thiếu ăn ý, ảnh hưởng đến chất lượng tiết mục."
+    ],
+    descSolo: [
+      "Kết nối tốt với khán giả, thu hút sự chú ý và tạo được sự hưởng ứng tích cực trong suốt tiết mục.",
+      "Có sự kết nối với khán giả, tạo được sự chú ý và hưởng ứng ở phần lớn tiết mục.",
+      "Có tương tác với khán giả nhưng còn hạn chế, chưa tạo được nhiều sự chú ý hoặc đồng cảm.",
+      "Thiếu sự kết nối với khán giả, chưa thu hút được sự chú ý, hưởng ứng."
+    ] }
+];
 
 const NOTE_COLOR = "#fde047";
 const THEMES = ["tuong-phan", "sang", "ruc-ro"];
 
 /* =========================================================
    2. LƯU TRỮ (Firebase nếu có cấu hình, ngược lại localStorage)
+   Cấu trúc: entries/{tiếtMụcId}/{giámKhảoId} = { solo, nhanxet, c: { tiêuChí: { s, n:[{t,d}] } } }
    ========================================================= */
 const useFirebase = !!FIREBASE_CONFIG.databaseURL;
 let db = null;
@@ -195,22 +265,22 @@ if (useFirebase) {
   if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
   db = firebase.database();
 }
-const LOCAL = { scores: "cc_scores_v3", notes: "cc_notes_v3" };
+const LOCAL_KEY = "cc_entries_v4";
 
-function listen(kind, cb) {
-  if (useFirebase) { db.ref(kind).on("value", s => cb(s.val() || {})); return; }
-  const load = () => cb(JSON.parse(localStorage.getItem(LOCAL[kind]) || "{}"));
+function listen(cb) {
+  if (useFirebase) { db.ref("entries").on("value", s => cb(s.val() || {})); return; }
+  const load = () => cb(JSON.parse(localStorage.getItem(LOCAL_KEY) || "{}"));
   load();
   window.addEventListener("storage", load);
   window.addEventListener("local-save", load);
 }
 
-function write(kind, perfId, judgeId, data) {
-  if (useFirebase) return db.ref(`${kind}/${perfId}/${judgeId}`).set(data);
-  const all = JSON.parse(localStorage.getItem(LOCAL[kind]) || "{}");
+function write(perfId, judgeId, data) {
+  if (useFirebase) return db.ref(`entries/${perfId}/${judgeId}`).set(data);
+  const all = JSON.parse(localStorage.getItem(LOCAL_KEY) || "{}");
   all[perfId] = all[perfId] || {};
   all[perfId][judgeId] = data;
-  localStorage.setItem(LOCAL[kind], JSON.stringify(all));
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(all));
   window.dispatchEvent(new Event("local-save"));
   return Promise.resolve();
 }
@@ -220,12 +290,10 @@ function write(kind, perfId, judgeId, data) {
    ========================================================= */
 const state = {
   judge: localStorage.getItem("judge_id") || "",
-  perf: null,
-  draft: {},        // { score, nhanxet }
-  noteItems: [],    // [{t, d}]
-  noteIn: "",
-  all: {},          // điểm từ server
-  notesAll: {},     // ghi chú từ server
+  perf: null,       // id tiết mục đang chấm
+  draft: null,      // bản nháp của giám khảo hiện tại
+  noteIn: {},       // nội dung ô nhập ghi chú, theo từng tiêu chí
+  all: {},          // toàn bộ dữ liệu từ server
   adminOK: false
 };
 
@@ -233,15 +301,57 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt = n => n == null ? "—" : (Math.round(n * 10) / 10).toString();
 const toArr = x => Object.values(x || {});
+const badge = b => b ? `<span class="badge" style="--bc:${b.color}">${b.name}</span>` : "";
 const toast = msg => {
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 1800);
 };
 const softRender = () => { if (location.hash === "#admin" || state.perf == null) render(); };
-const bandBadge = s => {
-  const b = bandOf(s);
-  return b ? `<span class="badge" style="--bc:${b.color}">${b.name}</span>` : "";
+
+// Điểm của 5 tiêu chí (src có dạng entry hoặc draft: { c: { key: { s } } })
+const scoresOf = src => CRITERIA.map(c => src?.c?.[c.key]?.s ?? null);
+// Điểm tiết mục = trung bình 5 tiêu chí; chỉ có khi đủ cả 5 tiêu chí
+const totalOf = src => {
+  const ss = scoresOf(src);
+  return ss.every(x => x != null) ? ss.reduce((a, b) => a + b, 0) / CRITERIA.length : null;
 };
+
+const emptyDraft = () => ({
+  solo: false,
+  nhanxet: "",
+  c: Object.fromEntries(CRITERIA.map(c => [c.key, { s: null, n: [] }]))
+});
+// Chuyển dữ liệu từ server (có thể thiếu trường) thành bản nháp đầy đủ
+function draftFrom(e) {
+  const d = emptyDraft();
+  if (!e) return d;
+  d.solo = !!e.solo;
+  d.nhanxet = e.nhanxet || "";
+  CRITERIA.forEach(c => {
+    const src = e.c?.[c.key] || {};
+    d.c[c.key] = { s: src.s ?? null, n: toArr(src.n).map(x => ({ t: x.t, d: !!x.d })) };
+  });
+  return d;
+}
+
+// Lưu toàn bộ bản nháp lên server (tự động sau mỗi thay đổi)
+function persist() {
+  if (!state.judge || state.perf == null || !state.draft) return;
+  const d = state.draft;
+  const payload = {
+    solo: !!d.solo,
+    nhanxet: d.nhanxet || "",
+    c: Object.fromEntries(CRITERIA.map(c => [c.key, {
+      s: d.c[c.key].s,
+      n: d.c[c.key].n
+    }])),
+    judgeName: JUDGES.find(j => j.id === state.judge)?.name || state.judge,
+    updatedAt: new Date().toISOString()
+  };
+  write(state.perf, state.judge, payload).catch(err => {
+    console.error(err); toast("Lỗi lưu, thử lại");
+  });
+}
 
 /* =========================================================
    4. GIAO DIỆN GIÁM KHẢO
@@ -255,87 +365,104 @@ function renderJudgeSelect() {
 
 function renderList() {
   return `<div class="grid">${PERFORMANCES.map(p => {
-    const s = state.all[p.id]?.[state.judge];
-    const nJudges = Object.keys(state.all[p.id] || {}).length;
-    const nNotes = toArr(state.notesAll[p.id]?.[state.judge]).length;
-    const b = bandOf(s?.score);
+    const e = state.all[p.id]?.[state.judge];
+    const n = scoresOf(e).filter(x => x != null).length;
+    const t = totalOf(e);
+    const tb = t != null ? bandOf(Math.round(t)) : null;
+    const nJudges = Object.keys(state.all[p.id] || {}).filter(j => totalOf(state.all[p.id][j]) != null).length;
+    const status = t != null
+      ? `<div class="status" style="color:${tb.color}">✔ ${fmt(t)}/${MAX_SCORE} · ${tb.name}</div>`
+      : `<div class="status todo">${n ? `Đang chấm: ${n}/${CRITERIA.length} tiêu chí` : "Chưa chấm"}</div>`;
     return `<button class="card" data-open="${p.id}">
       <span class="num">#${p.id}</span>
       <h3>${esc(p.title)}</h3>
       <div class="sub">${esc(p.sub)}</div>
-      <div class="status ${s ? "" : "todo"}" style="${s ? `color:${b.color}` : ""}">
-        ${s ? `✔ Đã chấm: ${s.score}/${MAX_SCORE} · ${b.name}` : "Chưa chấm"}
-      </div>
-      <div class="sub" style="margin-top:4px">Đã có ${nJudges}/${JUDGES.length} giám khảo chấm${nNotes ? ` · ${nNotes} ý ghi chú` : ""}</div>
+      ${status}
+      <div class="sub" style="margin-top:4px">Đã đủ điểm: ${nJudges}/${JUDGES.length} giám khảo</div>
     </button>`;
   }).join("")}</div>`;
 }
 
-function renderNoteList() {
-  if (!state.noteItems.length)
-    return `<div class="sub" style="margin-top:6px">Chưa có ý nào. Nhập ý cần nói rồi bấm Thêm.</div>`;
-  return state.noteItems.map((n, i) => `
+function renderNotes(c) {
+  const list = state.draft.c[c.key].n;
+  const items = list.map((n, j) => `
     <div class="note ${n.d ? "done" : ""}">
-      <span class="ntext" data-togglenote="${i}">${n.d ? "☑" : "☐"} ${esc(n.t)}</span>
-      <button data-delnote="${i}" aria-label="Xóa">✕</button>
+      <span class="ntext" data-togglenote="${c.key}:${j}">${n.d ? "☑" : "☐"} ${esc(n.t)}</span>
+      <button data-delnote="${c.key}:${j}" aria-label="Xóa">✕</button>
     </div>`).join("");
+  return items || `<div class="sub" style="margin-top:6px">Chưa có ghi chú.</div>`;
+}
+
+function renderCriterion(c, i) {
+  const d = state.draft;
+  const cd = d.c[c.key];
+  const b = bandOf(cd.s);
+  const descs = (c.key === "tuongtac" && d.solo) ? c.descSolo : c.desc;
+
+  const scoreBtns = SCORE_LIST.map(n => {
+    const bb = bandOf(n);
+    return `<button class="sc ${cd.s === n ? "sel" : ""}" style="--bc:${bb.color}"
+              data-crit="${c.key}" data-score="${n}">${n}</button>`;
+  }).join("");
+
+  const hints = BANDS.map((bb, k) => `
+    <div class="hint ${b && b.name === bb.name ? "on" : ""}" style="--bc:${bb.color}">
+      <b>${bb.name} · ${bb.range}</b>
+      <small>${esc(descs[k])}</small>
+    </div>`).join("");
+
+  return `
+    <div class="section" style="--c:${c.color}">
+      <div class="section-title"><span class="ctag">${i + 1}</span>${esc(c.name)}${(c.key === "tuongtac" && d.solo) ? ` <span class="sub">(cá nhân)</span>` : ""}</div>
+
+      <div class="display small" style="--bc:${b ? b.color : "var(--border)"}">
+        <div class="big">${cd.s ?? "—"}<span> / ${MAX_SCORE}</span></div>
+        <div class="blabel">${b ? badge(b) : `<span class="sub">Chưa chọn điểm</span>`}</div>
+      </div>
+
+      <div class="scores">${scoreBtns}</div>
+      <div class="hints">${hints}</div>
+
+      <div class="notes">
+        <div class="notes-title">📝 Ghi chú nhắc bài</div>
+        <div class="notes-add">
+          <input type="text" id="ni-${c.key}" data-noteinput="${c.key}"
+                 value="${esc(state.noteIn[c.key] || "")}" placeholder="Ý cần nói...">
+          <button class="btn-sec" data-addnote="${c.key}">+ Thêm</button>
+        </div>
+        ${renderNotes(c)}
+      </div>
+    </div>`;
 }
 
 function renderForm() {
   const p = PERFORMANCES.find(x => x.id === state.perf);
-  const s = state.draft.score;
-  const b = bandOf(s);
-
-  const display = `
-    <div class="display" style="--bc:${b ? b.color : "var(--border)"}">
-      <div class="big">${s ?? "—"}<span> / ${MAX_SCORE}</span></div>
-      <div class="blabel">${b ? bandBadge(s) : `<span class="sub">Chưa chọn điểm</span>`}</div>
-    </div>`;
-
-  const scoreBtns = SCORE_LIST.map(n => {
-    const bb = bandOf(n);
-    return `<button class="sc ${s === n ? "sel" : ""}" style="--bc:${bb.color}" data-score="${n}">${n}</button>`;
-  }).join("");
-
-  const hints = BANDS.map(bb => `
-    <div class="hint ${b && b.name === bb.name ? "on" : ""}" style="--bc:${bb.color}">
-      <b>${bb.name}</b><small>${bb.range}</small>
-    </div>`).join("");
+  const d = state.draft;
+  const n = scoresOf(d).filter(x => x != null).length;
+  const t = totalOf(d);
+  const tb = t != null ? bandOf(Math.round(t)) : null;
 
   return `
     <button class="back" data-back>← Danh sách tiết mục</button>
-    <h2 style="margin:4px 0 2px">#${p.id} · ${esc(p.title)}</h2>
-    <div class="sub" style="margin-bottom:12px">${esc(p.sub)}</div>
+    <h2 class="ptitle">#${p.id} · ${esc(p.title)}</h2>
+    <div class="sub" style="margin-bottom:8px">${esc(p.sub)}</div>
 
-    ${display}
+    <label class="toggle">
+      <input type="checkbox" id="soloChk" ${d.solo ? "checked" : ""}>
+      Tiết mục cá nhân (đổi mô tả tiêu chí Tương tác)
+    </label>
 
-    <div class="section" style="--c:#c084fc">
-      <div class="section-title">Chọn điểm (1 – ${MAX_SCORE})</div>
-      <div class="scores">${scoreBtns}</div>
+    <div class="display" style="--bc:${tb ? tb.color : "var(--border)"}">
+      <div class="sub">Điểm tiết mục (trung bình 5 tiêu chí)</div>
+      <div class="big">${t != null ? fmt(t) : "—"}<span> / ${MAX_SCORE}</span></div>
+      <div class="blabel">${tb ? badge(tb) : `<span class="sub">Đã chấm ${n}/${CRITERIA.length} tiêu chí</span>`}</div>
     </div>
 
-    <div class="section" style="--c:${b ? b.color : "var(--border)"}">
-      <div class="section-title">Gợi ý xếp loại</div>
-      <div class="hints">${hints}</div>
-    </div>
-
-    <div class="section" style="--c:${NOTE_COLOR}">
-      <div class="section-title">📝 Ý cần phát biểu</div>
-      <div class="notes-add">
-        <input type="text" id="noteIn" value="${esc(state.noteIn)}" placeholder="Nhập ý cần nói...">
-        <button class="btn-sec" data-addnote>+ Thêm</button>
-      </div>
-      <div id="noteList">${renderNoteList()}</div>
-    </div>
-
-    <div class="section" style="--c:var(--border)">
-      <div class="section-title">Nhận xét (không bắt buộc)</div>
-      <textarea id="nx" placeholder="Ghi nhận xét cho tiết mục...">${esc(state.draft.nhanxet || "")}</textarea>
-    </div>
+    ${CRITERIA.map((c, i) => renderCriterion(c, i)).join("")}
 
     <div class="total">
-      <div>Điểm: <strong>${s ?? "—"}</strong> / ${MAX_SCORE}</div>
-      <button class="btn-main" data-save ${s == null ? "disabled" : ""}>Lưu điểm</button>
+      <div>Đã chấm: <strong>${n}/${CRITERIA.length}</strong> tiêu chí</div>
+      <button class="btn-main" data-done ${n < CRITERIA.length ? "disabled" : ""}>Hoàn tất</button>
     </div>`;
 }
 
@@ -346,27 +473,29 @@ function renderJudge() {
 
 function openPerf(id) {
   state.perf = id;
-  const saved = state.all[id]?.[state.judge] || {};
-  state.draft = { score: saved.score ?? null, nhanxet: saved.nhanxet || "" };
-  state.noteItems = toArr(state.notesAll[id]?.[state.judge]).map(n => ({ t: n.t, d: !!n.d }));
-  state.noteIn = "";
+  state.draft = draftFrom(state.all[id]?.[state.judge]);
+  state.noteIn = {};
   render();
   window.scrollTo(0, 0);
 }
 
-function saveNotes() {
-  write("notes", state.perf, state.judge, state.noteItems).catch(err => {
-    console.error(err); toast("Lỗi lưu ghi chú");
-  });
+function closeForm() {
+  state.perf = null; state.draft = null; state.noteIn = {};
+  render(); window.scrollTo(0, 0);
 }
-function refreshNotes() { const el = $("#noteList"); if (el) el.innerHTML = renderNoteList(); }
-function addNote() {
-  const v = state.noteIn.trim();
+
+function setScore(key, n) {
+  state.draft.c[key].s = n;
+  persist(); render();
+}
+
+function addNote(key) {
+  const v = (state.noteIn[key] || "").trim();
   if (!v) return;
-  state.noteItems.push({ t: v, d: false });
-  state.noteIn = "";
-  const inp = $("#noteIn"); if (inp) { inp.value = ""; inp.focus(); }
-  saveNotes(); refreshNotes();
+  state.draft.c[key].n.push({ t: v, d: false });
+  state.noteIn[key] = "";
+  persist(); render();
+  document.getElementById(`ni-${key}`)?.focus();
 }
 
 /* =========================================================
@@ -374,14 +503,15 @@ function addNote() {
    ========================================================= */
 function computeRows() {
   const rows = PERFORMANCES.map(p => {
-    const per = JUDGES.map(j => ({
-      ...j,
-      s: state.all[p.id]?.[j.id] || null,
-      notes: toArr(state.notesAll[p.id]?.[j.id])
-    }));
-    const done = per.filter(x => x.s);
-    const avg = done.length ? done.reduce((a, x) => a + x.s.score, 0) / done.length : null;
-    return { p, per, done, avg };
+    const per = JUDGES.map(j => ({ ...j, e: state.all[p.id]?.[j.id] || null }));
+    const done = per.filter(x => totalOf(x.e) != null);
+    const avg = done.length ? done.reduce((a, x) => a + totalOf(x.e), 0) / done.length : null;
+    const crit = {};
+    CRITERIA.forEach(c => {
+      const ss = done.map(x => x.e.c[c.key].s);
+      crit[c.key] = ss.length ? ss.reduce((a, b) => a + b, 0) / ss.length : null;
+    });
+    return { p, per, done, avg, crit };
   });
   rows.forEach(r => {
     r.rank = r.avg == null ? null : 1 + rows.filter(o => o.avg != null && o.avg > r.avg).length;
@@ -409,7 +539,7 @@ function renderAdmin() {
           <div class="sub">#${r.p.id} · ${esc(r.p.sub)}</div>
           <h3>${esc(r.p.title)}</h3>
           <div class="score">${fmt(r.avg)}<span>/${MAX_SCORE}</span></div>
-          <div style="margin-top:6px">${bandBadge(Math.round(r.avg))}</div>
+          <div style="margin-top:6px">${badge(bandOf(Math.round(r.avg)))}</div>
         </div>`).join("")}
     </div>` : `<div class="msg">Chưa có điểm nào.</div>`;
 
@@ -418,28 +548,38 @@ function renderAdmin() {
       <td>${r.rank ?? "—"}</td>
       <td>${r.p.id}</td>
       <td class="l"><b>${esc(r.p.title)}</b><br><span class="sub">${esc(r.p.sub)}</span></td>
-      ${JUDGES.map(j => {
-        const s = r.per.find(x => x.id === j.id).s;
-        return `<td>${s ? s.score : "—"}</td>`;
-      }).join("")}
+      ${CRITERIA.map(c => `<td>${fmt(r.crit[c.key])}</td>`).join("")}
       <td class="tot">${fmt(r.avg)}</td>
-      <td>${r.avg == null ? "—" : bandBadge(Math.round(r.avg))}</td>
-      <td>${r.done.length}/${JUDGES.length}${r.done.length && r.done.length < JUDGES.length ? `<div class="sub" style="color:#fdba74">chưa đủ</div>` : ""}</td>
+      <td>${r.avg == null ? "—" : badge(bandOf(Math.round(r.avg)))}</td>
+      <td>${r.done.length}/${JUDGES.length}${r.done.length && r.done.length < JUDGES.length
+        ? `<div class="partial">chưa đủ</div>` : ""}</td>
     </tr>`).join("");
 
   const details = rows.map(r => `
     <details>
-      <summary>#${r.p.id} · ${esc(r.p.title)} — TB ${fmt(r.avg)}/${MAX_SCORE}</summary>
-      ${r.per.map(x => `
-        <div class="jrow">
-          <div class="head">
-            <b>${esc(x.name)}</b>
-            <span>${x.s ? `${x.s.score}/${MAX_SCORE} ${bandBadge(x.s.score)}` : "<span class='todo'>Chưa chấm</span>"}</span>
-          </div>
-          ${x.s?.nhanxet ? `<em>“${esc(x.s.nhanxet)}”</em>` : ""}
-          ${x.notes.length ? `<ul class="nlist">${x.notes.map(n =>
-              `<li class="${n.d ? "done" : ""}">${n.d ? "☑" : "☐"} ${esc(n.t)}</li>`).join("")}</ul>` : ""}
-        </div>`).join("")}
+      <summary>#${r.p.id} · ${esc(r.p.title)} — TB ${fmt(r.avg)}/${MAX_SCORE}${r.per.some(x => x.e?.solo) ? " · cá nhân" : ""}</summary>
+      ${r.per.map(x => {
+        const t = totalOf(x.e);
+        const n = scoresOf(x.e).filter(v => v != null).length;
+        const head = t != null
+          ? `${fmt(t)}/${MAX_SCORE} ${badge(bandOf(Math.round(t)))}`
+          : (x.e ? `<span class="partial">Chưa đủ: ${n}/${CRITERIA.length} tiêu chí</span>` : `<span class="sub">Chưa chấm</span>`);
+        const scoreLine = CRITERIA.map(c =>
+          `<span class="cs">${esc(c.name)}: <b>${x.e?.c?.[c.key]?.s ?? "—"}</b></span>`).join("");
+        const notesLines = CRITERIA.map(c => {
+          const list = toArr(x.e?.c?.[c.key]?.n);
+          if (!list.length) return "";
+          return `<div class="nh">${esc(c.name)}</div>
+            <ul class="nlist">${list.map(n => `<li class="${n.d ? "done" : ""}">${n.d ? "☑" : "☐"} ${esc(n.t)}</li>`).join("")}</ul>`;
+        }).join("");
+        return `
+          <div class="jrow">
+            <div class="head"><b>${esc(x.name)}${x.e?.solo ? " · cá nhân" : ""}</b><span>${head}</span></div>
+            <div>${scoreLine}</div>
+            ${x.e?.nhanxet ? `<em>“${esc(x.e.nhanxet)}”</em>` : ""}
+            ${notesLines}
+          </div>`;
+      }).join("")}
     </details>`).join("");
 
   return `
@@ -452,24 +592,25 @@ function renderAdmin() {
       <table>
         <thead><tr>
           <th>Hạng</th><th>STT</th><th class="l">Tiết mục</th>
-          ${JUDGES.map(j => `<th>${esc(j.name)}</th>`).join("")}
+          ${CRITERIA.map(c => `<th class="ch" style="--c:${c.color}">${esc(c.name)}<br>(TB /${MAX_SCORE})</th>`).join("")}
           <th>TB /${MAX_SCORE}</th><th>Xếp loại</th><th>GK</th>
         </tr></thead>
         <tbody>${body}</tbody>
       </table>
     </div>
-    <h3 style="margin:22px 0 8px">Chi tiết từng giám khảo, nhận xét & ý phát biểu</h3>
+    <h3 style="margin:22px 0 8px">Chi tiết từng giám khảo, nhận xét & ghi chú</h3>
     ${details}`;
 }
 
 function exportCSV() {
   const rows = computeRows();
-  const header = ["Hạng", "STT", "Tiết mục", "Tác giả", ...JUDGES.map(j => j.name),
-                  "TB", "Xếp loại", "Số GK đã chấm"];
+  const header = ["Hạng", "STT", "Tiết mục", "Tác giả", ...CRITERIA.map(c => c.name + " (TB)"),
+                  "TB /20", "Xếp loại", "Số GK đủ điểm", ...JUDGES.map(j => j.name + " (điểm TB)")];
   const lines = rows.map(r => [
     r.rank ?? "", r.p.id, r.p.title, r.p.sub,
-    ...r.per.map(x => x.s ? x.s.score : ""),
-    fmt(r.avg), r.avg == null ? "" : (bandOf(Math.round(r.avg))?.name || ""), r.done.length
+    ...CRITERIA.map(c => fmt(r.crit[c.key])),
+    fmt(r.avg), r.avg == null ? "" : (bandOf(Math.round(r.avg))?.name || ""), r.done.length,
+    ...r.per.map(x => { const t = totalOf(x.e); return t != null ? fmt(t) : ""; })
   ]);
   const csv = [header, ...lines]
     .map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
@@ -506,68 +647,65 @@ document.addEventListener("click", e => {
   const open = t.closest("[data-open]");
   if (open) return openPerf(Number(open.dataset.open));
 
-  if (t.closest("[data-back]")) {
-    state.perf = null; state.draft = {}; state.noteItems = [];
-    render(); window.scrollTo(0, 0); return;
-  }
+  if (t.closest("[data-back]")) return closeForm();
 
-  const sc = t.closest("[data-score]");
-  if (sc) {
-    state.draft.score = Number(sc.dataset.score);
-    state.draft.nhanxet = $("#nx")?.value ?? state.draft.nhanxet ?? "";
-    render(); return;
-  }
+  const sc = t.closest("[data-crit]");
+  if (sc) return setScore(sc.dataset.crit, Number(sc.dataset.score));
 
-  if (t.closest("[data-addnote]")) return addNote();
+  const add = t.closest("[data-addnote]");
+  if (add) return addNote(add.dataset.addnote);
 
   const tg = t.closest("[data-togglenote]");
   if (tg) {
-    const i = Number(tg.dataset.togglenote);
-    state.noteItems[i].d = !state.noteItems[i].d;
-    saveNotes(); refreshNotes(); return;
+    const [key, j] = tg.dataset.togglenote.split(":");
+    const item = state.draft.c[key].n[Number(j)];
+    item.d = !item.d;
+    persist(); render(); return;
   }
 
   const dn = t.closest("[data-delnote]");
   if (dn) {
-    state.noteItems.splice(Number(dn.dataset.delnote), 1);
-    saveNotes(); refreshNotes(); return;
+    const [key, j] = dn.dataset.delnote.split(":");
+    state.draft.c[key].n.splice(Number(j), 1);
+    persist(); render(); return;
   }
 
-  if (t.closest("[data-save]")) {
-    const s = state.draft.score;
-    if (s == null) return;
-    const b = bandOf(s);
-    const payload = {
-      score: s,
-      band: b.name,
-      nhanxet: $("#nx")?.value.trim() || "",
-      judgeName: JUDGES.find(j => j.id === state.judge)?.name || state.judge,
-      updatedAt: new Date().toISOString()
-    };
-    write("scores", state.perf, state.judge, payload).then(() => {
-      toast("✔ Đã lưu điểm");
-      state.perf = null; state.draft = {}; state.noteItems = []; state.noteIn = "";
-      render(); window.scrollTo(0, 0);
-    }).catch(err => { console.error(err); toast("Lỗi lưu, thử lại"); });
-    return;
+  if (t.closest("[data-done]")) {
+    if (totalOf(state.draft) == null) return;
+    persist();
+    toast("✔ Đã lưu đầy đủ điểm");
+    closeForm(); return;
   }
 
   if (t.closest("[data-export]")) exportCSV();
 });
 
+// Cập nhật bản nháp khi gõ (không render lại để khỏi mất con trỏ)
 document.addEventListener("input", e => {
-  if (e.target.id === "nx") state.draft.nhanxet = e.target.value;
-  if (e.target.id === "noteIn") state.noteIn = e.target.value;
+  const id = e.target.id;
+  if (id === "nx") state.draft.nhanxet = e.target.value;
+  if (e.target.dataset.noteinput) state.noteIn[e.target.dataset.noteinput] = e.target.value;
+});
+
+document.addEventListener("change", e => {
+  if (e.target.id === "nx") persist();
+  if (e.target.id === "soloChk") {
+    state.draft.solo = e.target.checked;
+    persist(); render();
+  }
 });
 
 document.addEventListener("keydown", e => {
-  if (e.target.id === "noteIn" && e.key === "Enter") { e.preventDefault(); addNote(); }
+  if (e.key === "Enter" && e.target.dataset.noteinput) {
+    e.preventDefault();
+    addNote(e.target.dataset.noteinput);
+  }
 });
 
 $("#judgeSel").addEventListener("change", e => {
   state.judge = e.target.value;
   localStorage.setItem("judge_id", state.judge);
-  state.perf = null; state.draft = {}; state.noteItems = [];
+  state.perf = null; state.draft = null; state.noteIn = {};
   render();
 });
 
@@ -585,8 +723,7 @@ $("#banner").hidden = useFirebase;
 renderJudgeSelect();
 setTheme(localStorage.getItem("theme") || "tuong-phan");
 
-listen("scores", all => { state.all = all || {}; softRender(); });
-listen("notes",  all => { state.notesAll = all || {}; softRender(); });
+listen(all => { state.all = all || {}; softRender(); });
 render();
 </script>
 </body>
