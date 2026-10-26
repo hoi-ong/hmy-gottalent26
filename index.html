@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="tuong-phan">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,53 +7,106 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
-:root{--primary:#b91c1c;--primary-d:#7f1d1d;--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--ok:#15803d;--warn:#b45309;--r:12px}
+/* ===== THEMES ===== */
+:root{
+  --bg:#000; --card:#151515; --field:#222; --text:#fff; --muted:#d4d4d4; --border:#666;
+  --primary:#facc15; --primary-text:#111; --header:#000; --header-text:#facc15;
+  --top:rgba(250,204,21,.18); --ok:#4ade80; --warn:#fdba74; --r:12px
+}
+html[data-theme="sang"]{
+  --bg:#f1f5f9; --card:#fff; --field:#fff; --text:#0f172a; --muted:#334155; --border:#94a3b8;
+  --primary:#b91c1c; --primary-text:#fff; --header:#b91c1c; --header-text:#fff;
+  --top:#fef9c3; --ok:#15803d; --warn:#b45309
+}
+html[data-theme="ruc-ro"]{
+  --bg:linear-gradient(135deg,#1e1b4b 0%,#6b21a8 55%,#be185d 100%);
+  --card:rgba(20,10,50,.82); --field:#2e1065; --text:#fff; --muted:#e9d5ff; --border:#f0abfc;
+  --primary:#fde047; --primary-text:#1e1b4b; --header:rgba(20,10,50,.92); --header-text:#fde047;
+  --top:rgba(253,224,71,.22); --ok:#86efac; --warn:#fdba74
+}
+
+/* ===== BASE ===== */
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.45;font-size:15px}
-header{background:var(--primary);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-header h1{font-size:1.05rem;margin:0;flex:1 1 auto}
-header select,header a.btn{font:inherit;padding:7px 10px;border-radius:8px;border:none;background:#fff;color:var(--text);text-decoration:none}
-header a.btn{background:var(--primary-d);color:#fff}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.45;font-size:16px}
+header{background:var(--header);color:var(--header-text);padding:12px 16px;position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:2px solid var(--primary)}
+header h1{font-size:1.1rem;margin:0;flex:1 1 auto;color:inherit}
+header select,header a.btn{font:inherit;font-size:.9rem;padding:8px 10px;border-radius:8px;
+  border:2px solid var(--primary);background:var(--field);color:var(--text);text-decoration:none}
+header a.btn{background:var(--primary);color:var(--primary-text);font-weight:700}
 main{max-width:1100px;margin:0 auto;padding:14px}
-.banner{background:#fff7ed;border:1px solid #fed7aa;color:var(--warn);padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:.9rem}
+.banner{background:#fff7ed;border:1px solid #fed7aa;color:#b45309;padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:.9rem}
 .msg{padding:24px;text-align:center;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
-.card:active{transform:scale(.99)}
-.num{display:inline-block;background:var(--primary);color:#fff;border-radius:6px;padding:1px 8px;font-size:.8rem;font-weight:600}
-.card h3{margin:8px 0 2px;font-size:1rem}
-.sub{color:var(--muted);font-size:.85rem}
-.status{margin-top:10px;font-size:.85rem;font-weight:600}
+.sub{color:var(--muted);font-size:.9rem}
 .ok{color:var(--ok)} .todo{color:var(--muted)}
-.back{background:none;border:none;color:var(--primary);font:inherit;font-weight:600;padding:6px 0;cursor:pointer}
-.crit{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px}
-.crit-title{font-weight:700;margin-bottom:8px}
-.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
-.lv{border:1.5px solid var(--border);background:#fff;border-radius:10px;padding:9px;text-align:left;font:inherit;cursor:pointer;color:var(--text)}
-.lv b{display:block;font-size:.9rem}
-.lv small{display:block;color:var(--muted);font-size:.75rem;margin-top:3px;line-height:1.3}
-.lv.sel{border-color:var(--primary);background:#fef2f2}
-.lv.sel b{color:var(--primary)}
-textarea{width:100%;min-height:80px;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff}
-.total{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 14px;margin:0 -14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.total strong{font-size:1.2rem;color:var(--primary)}
-.btn-main{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:11px 18px;font:inherit;font-weight:600;cursor:pointer}
-.btn-main:disabled{background:#d1d5db;cursor:not-allowed}
-.btn-sec{background:#fff;border:1px solid var(--border);border-radius:10px;padding:9px 14px;font:inherit;cursor:pointer}
-.table-wrap{overflow-x:auto;background:var(--card);border-radius:var(--r);border:1px solid var(--border)}
-table{border-collapse:collapse;width:100%;min-width:800px;font-size:.88rem}
-th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap}
-th{background:#f9fafb;font-size:.8rem;color:var(--muted)}
-td.l,th.l{text-align:left;white-space:normal;min-width:180px}
-tr.top td{background:#fefce8}
-.tot{font-weight:700;color:var(--primary)}
 .partial{color:var(--warn);font-size:.75rem}
-details{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:8px}
-summary{cursor:pointer;font-weight:600}
-.jrow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border);font-size:.9rem;flex-wrap:wrap}
-.jrow em{color:var(--muted);font-style:normal;flex-basis:100%}
+
+/* ===== JUDGE LIST ===== */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;
+  text-align:left;font:inherit;color:inherit;width:100%}
+.card:active{transform:scale(.98)}
+.num{display:inline-block;background:var(--primary);color:var(--primary-text);border-radius:6px;padding:1px 8px;font-size:.8rem;font-weight:700}
+.card h3{margin:8px 0 2px;font-size:1.05rem}
+.status{margin-top:10px;font-size:.9rem;font-weight:700}
+.back{background:none;border:none;color:var(--primary);font:inherit;font-weight:700;padding:6px 0;cursor:pointer}
+
+/* ===== SCORING FORM ===== */
+.crit{--c:var(--border);background:var(--card);border:1px solid var(--border);border-left:8px solid var(--c);
+  border-radius:var(--r);padding:12px;margin-bottom:12px}
+.crit-title{display:inline-block;background:var(--c);color:#111;font-weight:700;padding:4px 10px;border-radius:6px;margin-bottom:10px}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.lv{--lc:#999;border:2px solid var(--lc);background:var(--field);color:var(--text);border-radius:10px;
+  padding:9px;text-align:left;font:inherit;cursor:pointer}
+.lv b{display:block;font-size:.95rem}
+.lv small{display:block;color:var(--muted);font-size:.8rem;margin-top:3px;line-height:1.3}
+.lv.sel{background:var(--lc);color:#111}
+.lv.sel small{color:#222}
+textarea,input[type=text]{width:100%;border:2px solid var(--border);border-radius:10px;padding:10px;font:inherit;
+  background:var(--field);color:var(--text)}
+.notes-add{display:flex;gap:8px;margin-bottom:6px}
+.notes-add input{flex:1}
+.note{display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--field);margin-top:6px}
+.note .ntext{flex:1;cursor:pointer}
+.note.done .ntext{text-decoration:line-through;opacity:.6}
+.note button{background:none;border:none;color:inherit;font-size:1rem;cursor:pointer;padding:0 4px}
+.total{position:sticky;bottom:0;background:var(--card);border-top:3px solid var(--primary);padding:12px 14px;
+  margin:0 -14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.total strong{font-size:1.3rem;color:var(--primary)}
+.btn-main{background:var(--primary);color:var(--primary-text);border:none;border-radius:10px;padding:11px 18px;
+  font:inherit;font-weight:700;cursor:pointer}
+.btn-main:disabled{opacity:.4;cursor:not-allowed}
+.btn-sec{background:var(--field);color:var(--text);border:2px solid var(--primary);border-radius:10px;
+  padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+
+/* ===== ADMIN ===== */
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:99}
+.toolbar h2{margin:0}
+.podium{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.pod{background:var(--card);border:3px solid var(--c);border-radius:var(--r);padding:14px;text-align:center}
+.pod .medal{font-size:2.2rem;line-height:1}
+.pod h3{margin:6px 0 2px;font-size:1.05rem}
+.pod .score{font-size:1.9rem;font-weight:800;color:var(--c);margin-top:6px}
+.pod .score span{font-size:.9rem;color:var(--muted);font-weight:600}
+.table-wrap{overflow-x:auto;background:var(--card);border-radius:var(--r);border:1px solid var(--border)}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:.92rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap}
+th{background:var(--field);font-size:.8rem}
+th.crit-th{background:var(--c);color:#111}
+td.l,th.l{text-align:left;white-space:normal;min-width:180px}
+tr.top td{background:var(--top)}
+.tot{font-weight:800;color:var(--primary)}
+details{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:8px}
+summary{cursor:pointer;font-weight:700}
+.jrow{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);flex-wrap:wrap;font-size:.92rem}
+.jrow em{color:var(--muted);font-style:normal;flex-basis:100%}
+.nlist{margin:4px 0 0;padding-left:0;list-style:none;flex-basis:100%;font-size:.88rem}
+.nlist li{padding:2px 0}
+.nlist li.done{text-decoration:line-through;opacity:.6}
+
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#000;color:#fff;padding:10px 16px;
+  border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:99}
 #toast.show{opacity:1}
 </style>
 </head>
@@ -62,12 +115,17 @@ summary{cursor:pointer;font-weight:600}
 <header>
   <h1>🏆 Chấm điểm cuộc thi</h1>
   <select id="judgeSel" aria-label="Chọn giám khảo"></select>
-  <a class="btn" href="#admin">Tổng hợp</a>
+  <select id="themeSel" aria-label="Chọn giao diện">
+    <option value="tuong-phan">🌙 Tương phản cao</option>
+    <option value="sang">☀️ Sáng</option>
+    <option value="ruc-ro">🌈 Rực rỡ</option>
+  </select>
+  <a class="btn" id="adminLink" href="#admin">Tổng hợp</a>
 </header>
 
 <main>
   <div id="banner" class="banner" hidden>
-    ⚠️ Chưa cấu hình Firebase: dữ liệu chỉ lưu trên trình duyệt này (chế độ thử nghiệm). Xem hướng dẫn để đưa lên chế độ chung.
+    ⚠️ Chưa cấu hình Firebase: dữ liệu chỉ lưu trên trình duyệt này (chế độ thử nghiệm).
   </div>
   <div id="view"></div>
 </main>
@@ -76,8 +134,9 @@ summary{cursor:pointer;font-weight:600}
 
 <script>
 /* =========================================================
-   1. CẤU HÌNH — chỉnh tại đây
+   1. CẤU HÌNH
    ========================================================= */
+
 
 // Dán cấu hình Firebase vào đây (xem hướng dẫn bên dưới). Để trống = chế độ thử nghiệm.
 const FIREBASE_CONFIG = {
@@ -87,8 +146,7 @@ const FIREBASE_CONFIG = {
   projectId: "hmy-gottalent"
 };
 
-// Mật khẩu xem trang tổng hợp (thư ký). Đổi trước khi dùng.
-const ADMIN_PIN = "0004";
+const ADMIN_PIN = "1234";   // Đổi trước khi dùng
 
 const JUDGES = [
   { id: "gk1", name: "Giám khảo 1" },
@@ -109,36 +167,45 @@ const PERFORMANCES = [
   { id: 10, title: "Chúa Là Trung Tâm",          sub: "Nô-ê" }
 ];
 
-// 5 tiêu chí × 4 mức (Tốt=4, Khá=3, Đạt=2, Chưa đạt=1) → tối đa 20 điểm
-const LEVELS = ["Tốt", "Khá", "Đạt", "Chưa đạt"];
+// Mỗi mức có màu riêng để phân biệt nhanh trên điện thoại
+const LEVELS = [
+  { name: "Tốt",     score: 4, color: "#22c55e" },
+  { name: "Khá",     score: 3, color: "#60a5fa" },
+  { name: "Đạt",     score: 2, color: "#facc15" },
+  { name: "Chưa đạt",score: 1, color: "#f87171" }
+];
+
+// Mỗi tiêu chí có một màu riêng
 const CRITERIA = [
-  { key: "thongdiep", name: "Thông điệp", desc: [
+  { key: "thongdiep", name: "Thông điệp", color: "#c084fc", desc: [
       "Thông điệp rõ ràng, sâu sắc, và tạo cảm xúc.",
       "Thông điệp rõ, phù hợp và có ý nghĩa.",
       "Có thông điệp nhưng còn đơn giản.",
       "Thông điệp chưa rõ hoặc chưa phù hợp."] },
-  { key: "chuyenmon", name: "Chuyên môn theo thể loại", desc: [
+  { key: "chuyenmon", name: "Chuyên môn theo thể loại", color: "#fb923c", desc: [
       "Thực hiện thành thạo, chính xác; làm chủ kỹ năng đặc trưng; ít hoặc không có lỗi.",
       "Thực hiện tốt phần lớn yêu cầu; vài lỗi nhỏ, không ảnh hưởng nhiều.",
       "Hoàn thành nhưng còn khá nhiều lỗi hoặc hạn chế kỹ thuật.",
       "Chưa thực hiện được các yêu cầu cơ bản của tiết mục."] },
-  { key: "trinhdien", name: "Kỹ năng trình diễn", desc: [
+  { key: "trinhdien", name: "Kỹ năng trình diễn", color: "#f472b6", desc: [
       "Tự tin, biểu cảm tốt, làm chủ sân khấu và thu hút khán giả.",
       "Tự tin, thể hiện tốt nhưng đôi lúc chưa ổn định.",
       "Hoàn thành phần trình diễn nhưng còn thiếu tự tin/biểu cảm.",
       "Lúng túng, thiếu tự tin, chưa làm chủ sân khấu."] },
-  { key: "ydan", name: "Ý tưởng và dàn dựng", desc: [
+  { key: "ydan", name: "Ý tưởng và dàn dựng", color: "#2dd4bf", desc: [
       "Sáng tạo, ấn tượng; dàn dựng, đạo cụ, phục trang phù hợp và nổi bật.",
       "Ý tưởng rõ ràng, có đầu tư; dàn dựng, đạo cụ, phục trang phù hợp.",
       "Ý tưởng đơn giản; dàn dựng, đạo cụ, phục trang cơ bản.",
       "Ý tưởng/dàn dựng chưa rõ; đạo cụ, phục trang chưa phù hợp."] },
-  { key: "tuongtac", name: "Tương tác", desc: [
+  { key: "tuongtac", name: "Tương tác", color: "#a3e635", desc: [
       "Phối hợp rất tốt, các thành viên đều có vai trò và hỗ trợ nhau. (Cá nhân: kết nối tốt với khán giả)",
       "Phối hợp tốt, đa số thành viên tham gia tích cực. (Cá nhân: có kết nối, tạo được sự chú ý)",
       "Có sự phối hợp nhưng chưa đồng đều. (Cá nhân: tương tác còn hạn chế)",
       "Phối hợp thiếu ăn ý, ảnh hưởng chất lượng. (Cá nhân: thiếu kết nối với khán giả)"] }
 ];
 const MAX_TOTAL = CRITERIA.length * 4;
+const NOTE_COLOR = "#fde047";
+const THEMES = ["tuong-phan", "sang", "ruc-ro"];
 
 /* =========================================================
    2. LƯU TRỮ (Firebase nếu có cấu hình, ngược lại localStorage)
@@ -149,25 +216,26 @@ if (useFirebase) {
   if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
   db = firebase.database();
 }
-const LOCAL_KEY = "contest_scores_v1";
+const LOCAL = { scores: "cc_scores_v2", notes: "cc_notes_v2" };
 
-function subscribe(cb) {
+// kind = "scores" | "notes"; cb nhận toàn bộ dữ liệu { perfId: { judgeId: value } }
+function listen(kind, cb) {
   if (useFirebase) {
-    db.ref("scores").on("value", snap => cb(snap.val() || {}));
-  } else {
-    const load = () => cb(JSON.parse(localStorage.getItem(LOCAL_KEY) || "{}"));
-    load();
-    window.addEventListener("storage", load);
-    window.addEventListener("local-save", load);
+    db.ref(kind).on("value", s => cb(s.val() || {}));
+    return;
   }
+  const load = () => cb(JSON.parse(localStorage.getItem(LOCAL[kind]) || "{}"));
+  load();
+  window.addEventListener("storage", load);
+  window.addEventListener("local-save", load);
 }
 
-function saveScore(perfId, judgeId, data) {
-  if (useFirebase) return db.ref(`scores/${perfId}/${judgeId}`).set(data);
-  const all = JSON.parse(localStorage.getItem(LOCAL_KEY) || "{}");
+function write(kind, perfId, judgeId, data) {
+  if (useFirebase) return db.ref(`${kind}/${perfId}/${judgeId}`).set(data);
+  const all = JSON.parse(localStorage.getItem(LOCAL[kind]) || "{}");
   all[perfId] = all[perfId] || {};
   all[perfId][judgeId] = data;
-  localStorage.setItem(LOCAL_KEY, JSON.stringify(all));
+  localStorage.setItem(LOCAL[kind], JSON.stringify(all));
   window.dispatchEvent(new Event("local-save"));
   return Promise.resolve();
 }
@@ -177,20 +245,25 @@ function saveScore(perfId, judgeId, data) {
    ========================================================= */
 const state = {
   judge: localStorage.getItem("judge_id") || "",
-  perf: null,          // id tiết mục đang chấm
-  draft: {},           // điểm đang nhập
-  all: {},             // toàn bộ điểm từ server
+  perf: null,
+  draft: {},          // điểm + nhận xét đang nhập
+  noteItems: [],      // ý cần phát biểu của giám khảo hiện tại cho tiết mục đang mở
+  noteIn: "",         // nội dung ô nhập ý đang gõ
+  all: {},            // điểm từ server
+  notesAll: {},       // ghi chú từ server
   adminOK: false
 };
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt = n => n == null ? "—" : (Math.round(n * 100) / 100).toString();
+const toArr = x => Object.values(x || {});
 const toast = msg => {
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 1800);
 };
 const totalOf = d => CRITERIA.every(c => d[c.key]) ? CRITERIA.reduce((a, c) => a + d[c.key], 0) : null;
+const softRender = () => { if (location.hash === "#admin" || state.perf == null) render(); };
 
 /* =========================================================
    4. GIAO DIỆN GIÁM KHẢO
@@ -203,39 +276,45 @@ function renderJudgeSelect() {
 }
 
 function renderList() {
-  const cards = PERFORMANCES.map(p => {
+  return `<div class="grid">${PERFORMANCES.map(p => {
     const s = state.all[p.id]?.[state.judge];
-    const judgesDone = Object.keys(state.all[p.id] || {}).length;
-    const status = s
-      ? `<div class="status ok">✔ Đã chấm: ${s.total}/${MAX_TOTAL}</div>`
-      : `<div class="status todo">Chưa chấm</div>`;
+    const nJudges = Object.keys(state.all[p.id] || {}).length;
+    const nNotes = toArr(state.notesAll[p.id]?.[state.judge]).length;
     return `<button class="card" data-open="${p.id}">
       <span class="num">#${p.id}</span>
       <h3>${esc(p.title)}</h3>
       <div class="sub">${esc(p.sub)}</div>
-      ${status}
-      <div class="sub" style="margin-top:4px">Đã có ${judgesDone}/${JUDGES.length} giám khảo chấm</div>
+      <div class="status ${s ? "ok" : "todo"}">${s ? `✔ Đã chấm: ${s.total}/${MAX_TOTAL}` : "Chưa chấm"}</div>
+      <div class="sub" style="margin-top:4px">Đã có ${nJudges}/${JUDGES.length} giám khảo chấm${nNotes ? ` · ${nNotes} ý ghi chú` : ""}</div>
     </button>`;
-  }).join("");
-  return `<div class="grid">${cards}</div>`;
+  }).join("")}</div>`;
+}
+
+function renderNoteList() {
+  if (!state.noteItems.length)
+    return `<div class="sub" style="margin-top:6px">Chưa có ý nào. Nhập ý cần phát biểu rồi bấm Thêm.</div>`;
+  return state.noteItems.map((n, i) => `
+    <div class="note ${n.d ? "done" : ""}">
+      <span class="ntext" data-togglenote="${i}">${n.d ? "☑" : "☐"} ${esc(n.t)}</span>
+      <button data-delnote="${i}" aria-label="Xóa">✕</button>
+    </div>`).join("");
 }
 
 function renderForm() {
   const p = PERFORMANCES.find(x => x.id === state.perf);
   const d = state.draft;
   const total = totalOf(d);
+
   const blocks = CRITERIA.map(c => `
-    <div class="crit">
+    <div class="crit" style="--c:${c.color}">
       <div class="crit-title">${esc(c.name)}</div>
       <div class="levels">
-        ${LEVELS.map((lv, i) => {
-          const score = 4 - i;
-          return `<button class="lv ${d[c.key] === score ? "sel" : ""}"
-                    data-key="${c.key}" data-score="${score}">
-                    <b>${lv} · ${score}đ</b>
-                    <small>${esc(c.desc[i])}</small>
-                  </button>`;
-        }).join("")}
+        ${LEVELS.map((lv, i) => `
+          <button class="lv ${d[c.key] === lv.score ? "sel" : ""}"
+                  style="--lc:${lv.color}" data-key="${c.key}" data-score="${lv.score}">
+            <b>${lv.name} · ${lv.score}đ</b>
+            <small>${esc(c.desc[i])}</small>
+          </button>`).join("")}
       </div>
     </div>`).join("");
 
@@ -244,29 +323,57 @@ function renderForm() {
     <h2 style="margin:4px 0 2px">#${p.id} · ${esc(p.title)}</h2>
     <div class="sub" style="margin-bottom:12px">${esc(p.sub)}</div>
     ${blocks}
-    <div class="crit">
+
+    <div class="crit" style="--c:${NOTE_COLOR}">
+      <div class="crit-title">📝 Ý cần phát biểu</div>
+      <div class="notes-add">
+        <input type="text" id="noteIn" value="${esc(state.noteIn)}" placeholder="Nhập ý cần nói...">
+        <button class="btn-sec" data-addnote>+ Thêm</button>
+      </div>
+      <div id="noteList">${renderNoteList()}</div>
+    </div>
+
+    <div class="crit" style="--c:#e5e7eb">
       <div class="crit-title">Nhận xét (không bắt buộc)</div>
       <textarea id="nx" placeholder="Ghi nhận xét cho tiết mục...">${esc(d.nhanxet || "")}</textarea>
     </div>
+
     <div class="total">
-      <div>Tổng điểm: <strong>${total ?? "—"}</strong> / ${MAX_TOTAL}</div>
+      <div>Tổng: <strong>${total ?? "—"}</strong> / ${MAX_TOTAL}</div>
       <button class="btn-main" data-save ${total == null ? "disabled" : ""}>Lưu điểm</button>
     </div>`;
 }
 
 function renderJudge() {
-  if (!state.judge) {
-    $("#view").innerHTML = `<div class="msg">Vui lòng chọn tên giám khảo ở góc trên.</div>`;
-    return;
-  }
-  $("#view").innerHTML = state.perf == null ? renderList() : renderForm();
+  if (!state.judge) return `<div class="msg">Vui lòng chọn tên giám khảo ở góc trên.</div>`;
+  return state.perf == null ? renderList() : renderForm();
 }
 
 function openPerf(id) {
   state.perf = id;
   state.draft = { ...(state.all[id]?.[state.judge] || {}) };
+  state.noteItems = toArr(state.notesAll[id]?.[state.judge]).map(n => ({ t: n.t, d: !!n.d }));
+  state.noteIn = "";
   render();
   window.scrollTo(0, 0);
+}
+
+function saveNotes() {
+  write("notes", state.perf, state.judge, state.noteItems).catch(err => {
+    console.error(err); toast("Lỗi lưu ghi chú");
+  });
+}
+function refreshNotes() {
+  const el = $("#noteList"); if (el) el.innerHTML = renderNoteList();
+}
+function addNote() {
+  const v = state.noteIn.trim();
+  if (!v) return;
+  state.noteItems.push({ t: v, d: false });
+  state.noteIn = "";
+  const inp = $("#noteIn"); if (inp) { inp.value = ""; inp.focus(); }
+  saveNotes();
+  refreshNotes();
 }
 
 /* =========================================================
@@ -274,14 +381,17 @@ function openPerf(id) {
    ========================================================= */
 function computeRows() {
   const rows = PERFORMANCES.map(p => {
-    const per = JUDGES.map(j => ({ ...j, s: state.all[p.id]?.[j.id] || null }));
+    const per = JUDGES.map(j => ({
+      ...j,
+      s: state.all[p.id]?.[j.id] || null,
+      notes: toArr(state.notesAll[p.id]?.[j.id])
+    }));
     const done = per.filter(x => x.s);
     const avg = k => done.length ? done.reduce((a, x) => a + x.s[k], 0) / done.length : null;
     const crit = {};
     CRITERIA.forEach(c => crit[c.key] = avg(c.key));
     return { p, per, done, crit, total: avg("total") };
   });
-  // xếp hạng (ranking chuẩn: bằng điểm → cùng hạng)
   rows.forEach(r => {
     r.rank = r.total == null ? null : 1 + rows.filter(o => o.total != null && o.total > r.total).length;
   });
@@ -291,15 +401,28 @@ function computeRows() {
 function renderAdmin() {
   if (!state.adminOK) {
     const pin = prompt("Nhập mật khẩu thư ký:");
-    if (pin !== ADMIN_PIN) {
-      location.hash = "";
-      return "";
-    }
+    if (pin !== ADMIN_PIN) { location.hash = ""; return ""; }
     state.adminOK = true;
   }
   const rows = computeRows();
-  const body = rows.map(r => `
-    <tr class="${r.rank === 1 && r.total != null ? "top" : ""}">
+  const sorted = [...rows].sort((a, b) => (b.total ?? -1) - (a.total ?? -1) || a.p.id - b.p.id);
+  const top3 = sorted.filter(r => r.total != null).slice(0, 3);
+  const medals = [["🥇", "#facc15"], ["🥈", "#cbd5e1"], ["🥉", "#fb923c"]];
+
+  const podium = top3.length ? `
+    <h2 style="margin:0 0 10px">🏆 Bảng xếp hạng</h2>
+    <div class="podium">
+      ${top3.map((r, i) => `
+        <div class="pod" style="--c:${medals[i][1]}">
+          <div class="medal">${medals[i][0]}</div>
+          <div class="sub">#${r.p.id} · ${esc(r.p.sub)}</div>
+          <h3>${esc(r.p.title)}</h3>
+          <div class="score">${fmt(r.total)}<span>/${MAX_TOTAL}</span></div>
+        </div>`).join("")}
+    </div>` : `<div class="msg">Chưa có điểm nào.</div>`;
+
+  const body = sorted.map(r => `
+    <tr class="${r.rank === 1 ? "top" : ""}">
       <td>${r.rank ?? "—"}</td>
       <td>${r.p.id}</td>
       <td class="l"><b>${esc(r.p.title)}</b><br><span class="sub">${esc(r.p.sub)}</span></td>
@@ -317,25 +440,28 @@ function renderAdmin() {
           <span><b>${esc(x.name)}</b></span>
           <span>${x.s ? `${x.s.total}/${MAX_TOTAL}` : "<span class='todo'>Chưa chấm</span>"}</span>
           ${x.s?.nhanxet ? `<em>“${esc(x.s.nhanxet)}”</em>` : ""}
+          ${x.notes.length ? `<ul class="nlist">${x.notes.map(n =>
+              `<li class="${n.d ? "done" : ""}">${n.d ? "☑" : "☐"} ${esc(n.t)}</li>`).join("")}</ul>` : ""}
         </div>`).join("")}
     </details>`).join("");
 
   return `
+    ${podium}
     <div class="toolbar">
-      <h2 style="margin:0">Tổng hợp điểm</h2>
+      <h2>Tổng hợp điểm</h2>
       <button class="btn-sec" data-export>⬇ Xuất CSV</button>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr>
           <th>Hạng</th><th>STT</th><th class="l">Tiết mục</th>
-          ${CRITERIA.map(c => `<th>${esc(c.name)}<br>(/4)</th>`).join("")}
+          ${CRITERIA.map(c => `<th class="crit-th" style="--c:${c.color}">${esc(c.name)}<br>(TB/4)</th>`).join("")}
           <th>TB /${MAX_TOTAL}</th><th>GK</th>
         </tr></thead>
         <tbody>${body}</tbody>
       </table>
     </div>
-    <h3 style="margin:20px 0 8px">Chi tiết từng giám khảo & nhận xét</h3>
+    <h3 style="margin:20px 0 8px">Chi tiết từng giám khảo, nhận xét & ý phát biểu</h3>
     ${details}`;
 }
 
@@ -360,73 +486,97 @@ function exportCSV() {
 }
 
 /* =========================================================
-   6. ĐIỀU KHIỂN CHUNG
+   6. GIAO DIỆN & ĐIỀU KHIỂN CHUNG
    ========================================================= */
+function setTheme(t) {
+  if (!THEMES.includes(t)) t = "tuong-phan";
+  document.documentElement.dataset.theme = t;
+  localStorage.setItem("theme", t);
+  $("#themeSel").value = t;
+}
+
 function render() {
   const isAdmin = location.hash === "#admin";
-  $("#judgeSel").parentElement; // giữ header
   $("#judgeSel").style.display = isAdmin ? "none" : "";
   $("header h1").textContent = isAdmin ? "📊 Thư ký — Tổng hợp" : "🏆 Chấm điểm cuộc thi";
-  $("header a.btn").textContent = isAdmin ? "← Giám khảo" : "Tổng hợp";
-  $("header a.btn").href = isAdmin ? "#" : "#admin";
-
-  if (isAdmin) {
-    $("#view").innerHTML = renderAdmin();
-  } else {
-    renderJudge();
-  }
+  $("#adminLink").textContent = isAdmin ? "← Giám khảo" : "Tổng hợp";
+  $("#adminLink").href = isAdmin ? "#" : "#admin";
+  $("#view").innerHTML = isAdmin ? renderAdmin() : renderJudge();
 }
 
 document.addEventListener("click", e => {
-  const open = e.target.closest("[data-open]");
+  const t = e.target;
+
+  const open = t.closest("[data-open]");
   if (open) return openPerf(Number(open.dataset.open));
 
-  if (e.target.closest("[data-back]")) {
-    state.perf = null; state.draft = {}; render(); window.scrollTo(0, 0); return;
+  if (t.closest("[data-back]")) {
+    state.perf = null; state.draft = {}; state.noteItems = []; render(); window.scrollTo(0, 0); return;
   }
 
-  const lv = e.target.closest(".lv");
+  const lv = t.closest(".lv");
   if (lv) {
-    const key = lv.dataset.key, score = Number(lv.dataset.score);
-    state.draft[key] = score;
-    const nx = $("#nx")?.value; if (nx != null) state.draft.nhanxet = nx;
+    state.draft[lv.dataset.key] = Number(lv.dataset.score);
+    state.draft.nhanxet = $("#nx")?.value ?? state.draft.nhanxet ?? "";
     render(); return;
   }
 
-  if (e.target.closest("[data-save]")) {
+  if (t.closest("[data-addnote]")) return addNote();
+
+  const tg = t.closest("[data-togglenote]");
+  if (tg) {
+    const i = Number(tg.dataset.togglenote);
+    state.noteItems[i].d = !state.noteItems[i].d;
+    saveNotes(); refreshNotes(); return;
+  }
+
+  const dn = t.closest("[data-delnote]");
+  if (dn) {
+    state.noteItems.splice(Number(dn.dataset.delnote), 1);
+    saveNotes(); refreshNotes(); return;
+  }
+
+  if (t.closest("[data-save]")) {
     const d = state.draft;
     const total = totalOf(d);
     if (total == null) return;
     const payload = {
-      ...CRITERIA.reduce((o, c) => (o[c.key] = d[c.key], o), {}),
+      ...Object.fromEntries(CRITERIA.map(c => [c.key, d[c.key]])),
       nhanxet: $("#nx")?.value.trim() || "",
       total,
       judgeName: JUDGES.find(j => j.id === state.judge)?.name || state.judge,
       updatedAt: new Date().toISOString()
     };
-    saveScore(state.perf, state.judge, payload).then(() => {
+    write("scores", state.perf, state.judge, payload).then(() => {
       toast("✔ Đã lưu điểm");
-      state.perf = null; state.draft = {}; render(); window.scrollTo(0, 0);
+      state.perf = null; state.draft = {}; state.noteItems = []; state.noteIn = "";
+      render(); window.scrollTo(0, 0);
     }).catch(err => {
       console.error(err); toast("Lỗi lưu, thử lại");
     });
     return;
   }
 
-  if (e.target.closest("[data-export]")) exportCSV();
+  if (t.closest("[data-export]")) exportCSV();
 });
 
-// Ghi nhận xét khi gõ (không re-render để khỏi mất con trỏ)
 document.addEventListener("input", e => {
   if (e.target.id === "nx") state.draft.nhanxet = e.target.value;
+  if (e.target.id === "noteIn") state.noteIn = e.target.value;
+});
+
+document.addEventListener("keydown", e => {
+  if (e.target.id === "noteIn" && e.key === "Enter") { e.preventDefault(); addNote(); }
 });
 
 $("#judgeSel").addEventListener("change", e => {
   state.judge = e.target.value;
   localStorage.setItem("judge_id", state.judge);
-  state.perf = null; state.draft = {};
+  state.perf = null; state.draft = {}; state.noteItems = [];
   render();
 });
+
+$("#themeSel").addEventListener("change", e => setTheme(e.target.value));
 
 window.addEventListener("hashchange", () => {
   state.adminOK = state.adminOK && location.hash === "#admin";
@@ -438,11 +588,11 @@ window.addEventListener("hashchange", () => {
    ========================================================= */
 $("#banner").hidden = useFirebase;
 renderJudgeSelect();
-subscribe(all => {
-  state.all = all || {};
-  // Khi đang nhập điểm ở form thì không re-render, tránh mất dữ liệu đang gõ
-  if (location.hash === "#admin" || state.perf == null) render();
-});
+setTheme(localStorage.getItem("theme") || "tuong-phan");
+
+listen("scores", all => { state.all = all || {}; softRender(); });
+listen("notes",  all => { state.notesAll = all || {}; softRender(); });
+render();
 </script>
 </body>
 </html>
