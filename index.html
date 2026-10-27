@@ -151,7 +151,7 @@ summary{cursor:pointer;font-weight:700}
 <body>
 
 <header>
-  <h1>🏆 Chấm điểm cuộc thi</h1>
+  <h1>🏆 HMY GOT TALENT 2026</h1>
   <span id="who" class="who" hidden>👤 <b id="whoName"></b>
     <button class="btn-sec" data-rename>Đổi tên</button>
   </span>
@@ -176,6 +176,7 @@ summary{cursor:pointer;font-weight:700}
 /* =========================================================
    1. CẤU HÌNH
    ========================================================= */
+
 // Dán cấu hình Firebase vào đây (xem hướng dẫn bên dưới). Để trống = chế độ thử nghiệm.
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDQLIfZ_sZYR8uRK0qD7hmosuQWrTj9vMA",
@@ -183,10 +184,10 @@ const FIREBASE_CONFIG = {
   databaseURL: "https://hmy-gottalent-default-rtdb.asia-southeast1.firebasedatabase.app",   // ví dụ: "https://ten-du-an-default-rtdb.asia-southeast1.firebasedatabase.app"
   projectId: "hmy-gottalent"
 };
-const ADMIN_PIN = "1234";   // Đổi trước khi dùng
 
-const ADMIN_PIN = "1234";   // Mật khẩu vào trang tổng hợp. Đổi trước khi dùng
-const RESET_PIN = "2468";   // Mật khẩu xác nhận reset bảng điểm. Đổi trước khi dùng
+
+const ADMIN_PIN = "1028";   // Mật khẩu vào trang tổng hợp. Đổi trước khi dùng
+const RESET_PIN = "1028";   // Mật khẩu xác nhận reset bảng điểm. Đổi trước khi dùng
 
 const PERFORMANCES = [
   { id: 1,  title: "Quyền Năng Sáng Tạo",        sub: "Giô-suê" },
@@ -722,3 +723,86 @@ function render() {
   $("#whoName").textContent = state.judgeName;
   $("#view").innerHTML = isAdmin ? renderAdmin() : renderJudge();
   if (!isAdmin && !state.judge) $("#jname")?.focus();
+}
+
+document.addEventListener("click", e => {
+  const t = e.target;
+
+  if (t.closest("[data-login]")) return login();
+  if (t.closest("[data-rename]")) return rename();
+  if (t.closest("[data-reset]")) return resetAll();
+
+  const open = t.closest("[data-open]");
+  if (open) return openPerf(Number(open.dataset.open));
+
+  if (t.closest("[data-back]")) return closeForm();
+
+  const sc = t.closest("[data-crit]");
+  if (sc) return setScore(sc.dataset.crit, Number(sc.dataset.score));
+
+  const add = t.closest("[data-addnote]");
+  if (add) return addNote(add.dataset.addnote);
+
+  const tg = t.closest("[data-togglenote]");
+  if (tg) {
+    const [key, j] = tg.dataset.togglenote.split(":");
+    const item = state.draft.c[key].n[Number(j)];
+    item.d = !item.d;
+    persist(); render(); return;
+  }
+
+  const dn = t.closest("[data-delnote]");
+  if (dn) {
+    const [key, j] = dn.dataset.delnote.split(":");
+    state.draft.c[key].n.splice(Number(j), 1);
+    persist(); render(); return;
+  }
+
+  if (t.closest("[data-done]")) {
+    if (totalOf(state.draft) == null) return;
+    persist();
+    toast("✔ Đã lưu đầy đủ điểm");
+    closeForm(); return;
+  }
+
+  if (t.closest("[data-export]")) exportCSV();
+});
+
+// Cập nhật bản nháp khi gõ (không render lại để khỏi mất con trỏ)
+document.addEventListener("input", e => {
+  if (e.target.id === "nx" && state.draft) state.draft.nhanxet = e.target.value;
+  if (e.target.dataset.noteinput) state.noteIn[e.target.dataset.noteinput] = e.target.value;
+});
+
+document.addEventListener("change", e => {
+  if (e.target.id === "nx" && state.draft) persist();
+  if (e.target.id === "soloChk" && state.draft) {
+    state.draft.solo = e.target.checked;
+    persist(); render();
+  }
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  if (e.target.id === "jname") { e.preventDefault(); login(); }
+  if (e.target.dataset.noteinput) { e.preventDefault(); addNote(e.target.dataset.noteinput); }
+});
+
+$("#themeSel").addEventListener("change", e => setTheme(e.target.value));
+
+window.addEventListener("hashchange", () => {
+  state.adminOK = state.adminOK && location.hash === "#admin";
+  render();
+});
+
+/* =========================================================
+   7. KHỞI ĐỘNG
+   ========================================================= */
+$("#banner").hidden = useFirebase;
+setTheme(localStorage.getItem("theme") || "tuong-phan");
+
+listen(all => { state.all = all || {}; softRender(); });
+render();
+</script>
+</body>
+</html>
