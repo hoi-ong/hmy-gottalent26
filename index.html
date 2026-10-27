@@ -33,12 +33,20 @@ header h1{font-size:1.15rem;margin:0;flex:1 1 auto;color:inherit}
 header select,header a.btn{font:inherit;font-size:1rem;padding:9px 10px;border-radius:10px;
   border:2px solid var(--primary);background:var(--field);color:var(--text);text-decoration:none}
 header a.btn{background:var(--primary);color:var(--primary-text);font-weight:700}
+.who{display:flex;align-items:center;gap:8px;font-size:1rem}
+.who[hidden]{display:none}
+.who .btn-sec{padding:6px 10px;font-size:.9rem}
 main{max-width:1100px;margin:0 auto;padding:14px}
 .banner{background:#fff7ed;border:1px solid #fed7aa;color:#b45309;padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:.95rem}
 .msg{padding:28px;text-align:center;color:var(--muted);font-size:1.1rem}
 .sub{color:var(--muted);font-size:.95rem}
 .ok{color:#4ade80}.todo{color:var(--muted)}
 .partial{color:#fdba74}
+
+/* ===== LOGIN ===== */
+.login{max-width:520px;margin:24px auto;background:var(--card);border:2px solid var(--primary);border-radius:var(--r);padding:20px}
+.login input{font-size:1.15rem;padding:14px}
+.login .btn-main{width:100%;margin-top:12px}
 
 /* ===== LIST ===== */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
@@ -104,10 +112,12 @@ input[type=text],textarea{width:100%;border:2px solid var(--border);border-radiu
 .btn-main:disabled{opacity:.4;cursor:not-allowed}
 .btn-sec{background:var(--field);color:var(--text);border:2px solid var(--primary);border-radius:10px;
   padding:9px 14px;font:inherit;font-weight:700;cursor:pointer}
+.btn-danger{background:#dc2626;color:#fff;border:none;border-radius:10px;padding:9px 14px;font:inherit;font-weight:700;cursor:pointer}
 
 /* ===== ADMIN ===== */
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
 .toolbar h2{margin:0}
+.tbtns{display:flex;gap:8px;flex-wrap:wrap}
 .podium{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:18px}
 .pod{background:var(--card);border:3px solid var(--c);border-radius:var(--r);padding:16px;text-align:center}
 .pod .medal{font-size:2.4rem;line-height:1}
@@ -142,7 +152,9 @@ summary{cursor:pointer;font-weight:700}
 
 <header>
   <h1>🏆 Chấm điểm cuộc thi</h1>
-  <select id="judgeSel" aria-label="Chọn giám khảo"></select>
+  <span id="who" class="who" hidden>👤 <b id="whoName"></b>
+    <button class="btn-sec" data-rename>Đổi tên</button>
+  </span>
   <select id="themeSel" aria-label="Chọn giao diện">
     <option value="tuong-phan">🌙 Tương phản cao</option>
     <option value="sang">☀️ Sáng</option>
@@ -164,7 +176,6 @@ summary{cursor:pointer;font-weight:700}
 /* =========================================================
    1. CẤU HÌNH
    ========================================================= */
-
 // Dán cấu hình Firebase vào đây (xem hướng dẫn bên dưới). Để trống = chế độ thử nghiệm.
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDQLIfZ_sZYR8uRK0qD7hmosuQWrTj9vMA",
@@ -174,11 +185,8 @@ const FIREBASE_CONFIG = {
 };
 const ADMIN_PIN = "1234";   // Đổi trước khi dùng
 
-const JUDGES = [
-  { id: "gk1", name: "Giám khảo 1" },
-  { id: "gk2", name: "Giám khảo 2" },
-  { id: "gk3", name: "Giám khảo 3" }
-];
+const ADMIN_PIN = "1234";   // Mật khẩu vào trang tổng hợp. Đổi trước khi dùng
+const RESET_PIN = "2468";   // Mật khẩu xác nhận reset bảng điểm. Đổi trước khi dùng
 
 const PERFORMANCES = [
   { id: 1,  title: "Quyền Năng Sáng Tạo",        sub: "Giô-suê" },
@@ -207,7 +215,6 @@ const BANDS = [
 const bandOf = s => (s == null ? null : (BANDS.find(b => s >= b.min && s <= b.max) || null));
 
 // 5 tiêu chí theo tài liệu. desc = 4 mô tả (Tốt, Khá, Đạt, Chưa đạt).
-// Tương tác có thêm descSolo cho tiết mục cá nhân.
 const CRITERIA = [
   { key: "thongdiep", name: "Thông điệp", color: "#c084fc",
     desc: [
@@ -257,7 +264,7 @@ const THEMES = ["tuong-phan", "sang", "ruc-ro"];
 
 /* =========================================================
    2. LƯU TRỮ (Firebase nếu có cấu hình, ngược lại localStorage)
-   Cấu trúc: entries/{tiếtMụcId}/{giámKhảoId} = { solo, nhanxet, c: { tiêuChí: { s, n:[{t,d}] } } }
+   Cấu trúc: entries/{tiếtMụcId}/{judgeId} = { solo, nhanxet, judgeName, c: { tiêuChí: { s, n:[{t,d}] } } }
    ========================================================= */
 const useFirebase = !!FIREBASE_CONFIG.databaseURL;
 let db = null;
@@ -289,11 +296,12 @@ function write(perfId, judgeId, data) {
    3. TRẠNG THÁI & TIỆN ÍCH
    ========================================================= */
 const state = {
-  judge: localStorage.getItem("judge_id") || "",
-  perf: null,       // id tiết mục đang chấm
-  draft: null,      // bản nháp của giám khảo hiện tại
-  noteIn: {},       // nội dung ô nhập ghi chú, theo từng tiêu chí
-  all: {},          // toàn bộ dữ liệu từ server
+  judge: localStorage.getItem("judge_id") || "",       // mã giám khảo (sinh tự động)
+  judgeName: localStorage.getItem("judge_name") || "", // tên do giám khảo nhập
+  perf: null,
+  draft: null,
+  noteIn: {},
+  all: {},
   adminOK: false
 };
 
@@ -306,11 +314,13 @@ const toast = msg => {
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 1800);
 };
-const softRender = () => { if (location.hash === "#admin" || state.perf == null) render(); };
+// Chỉ render lại khi không đang nhập điểm/ghi chú, tránh mất dữ liệu đang gõ
+const softRender = () => {
+  if (location.hash === "#admin") return render();
+  if (state.judge && state.perf == null) render();
+};
 
-// Điểm của 5 tiêu chí (src có dạng entry hoặc draft: { c: { key: { s } } })
 const scoresOf = src => CRITERIA.map(c => src?.c?.[c.key]?.s ?? null);
-// Điểm tiết mục = trung bình 5 tiêu chí; chỉ có khi đủ cả 5 tiêu chí
 const totalOf = src => {
   const ss = scoresOf(src);
   return ss.every(x => x != null) ? ss.reduce((a, b) => a + b, 0) / CRITERIA.length : null;
@@ -321,7 +331,6 @@ const emptyDraft = () => ({
   nhanxet: "",
   c: Object.fromEntries(CRITERIA.map(c => [c.key, { s: null, n: [] }]))
 });
-// Chuyển dữ liệu từ server (có thể thiếu trường) thành bản nháp đầy đủ
 function draftFrom(e) {
   const d = emptyDraft();
   if (!e) return d;
@@ -341,11 +350,8 @@ function persist() {
   const payload = {
     solo: !!d.solo,
     nhanxet: d.nhanxet || "",
-    c: Object.fromEntries(CRITERIA.map(c => [c.key, {
-      s: d.c[c.key].s,
-      n: d.c[c.key].n
-    }])),
-    judgeName: JUDGES.find(j => j.id === state.judge)?.name || state.judge,
+    c: Object.fromEntries(CRITERIA.map(c => [c.key, { s: d.c[c.key].s, n: d.c[c.key].n }])),
+    judgeName: state.judgeName,
     updatedAt: new Date().toISOString()
   };
   write(state.perf, state.judge, payload).catch(err => {
@@ -353,14 +359,30 @@ function persist() {
   });
 }
 
+// Danh sách giám khảo đã xuất hiện trong dữ liệu: { judgeId: tên }
+function judgesMap() {
+  const m = {};
+  Object.values(state.all).forEach(byJudge => {
+    Object.entries(byJudge || {}).forEach(([jid, e]) => {
+      if (e) m[jid] = e.judgeName || m[jid] || jid;
+    });
+  });
+  return m;
+}
+
 /* =========================================================
    4. GIAO DIỆN GIÁM KHẢO
    ========================================================= */
-function renderJudgeSelect() {
-  $("#judgeSel").innerHTML =
-    `<option value="">-- Chọn giám khảo --</option>` +
-    JUDGES.map(j => `<option value="${j.id}">${esc(j.name)}</option>`).join("");
-  $("#judgeSel").value = state.judge;
+function renderLogin() {
+  return `
+    <div class="login">
+      <h2 class="ptitle">Nhập tên giám khảo</h2>
+      <div class="sub">Tên sẽ hiển thị trong bảng tổng hợp của thư ký.</div>
+      <div style="margin-top:12px">
+        <input type="text" id="jname" maxlength="40" placeholder="Ví dụ: Nguyễn Văn A" autocomplete="off">
+      </div>
+      <button class="btn-main" data-login>Vào chấm điểm</button>
+    </div>`;
 }
 
 function renderList() {
@@ -369,7 +391,7 @@ function renderList() {
     const n = scoresOf(e).filter(x => x != null).length;
     const t = totalOf(e);
     const tb = t != null ? bandOf(Math.round(t)) : null;
-    const nJudges = Object.keys(state.all[p.id] || {}).filter(j => totalOf(state.all[p.id][j]) != null).length;
+    const nJudges = Object.values(state.all[p.id] || {}).filter(x => totalOf(x) != null).length;
     const status = t != null
       ? `<div class="status" style="color:${tb.color}">✔ ${fmt(t)}/${MAX_SCORE} · ${tb.name}</div>`
       : `<div class="status todo">${n ? `Đang chấm: ${n}/${CRITERIA.length} tiêu chí` : "Chưa chấm"}</div>`;
@@ -378,7 +400,7 @@ function renderList() {
       <h3>${esc(p.title)}</h3>
       <div class="sub">${esc(p.sub)}</div>
       ${status}
-      <div class="sub" style="margin-top:4px">Đã đủ điểm: ${nJudges}/${JUDGES.length} giám khảo</div>
+      <div class="sub" style="margin-top:4px">Đã đủ điểm: ${nJudges} giám khảo</div>
     </button>`;
   }).join("")}</div>`;
 }
@@ -460,6 +482,11 @@ function renderForm() {
 
     ${CRITERIA.map((c, i) => renderCriterion(c, i)).join("")}
 
+    <div class="section" style="--c:var(--border)">
+      <div class="section-title">Nhận xét chung (không bắt buộc)</div>
+      <textarea id="nx" placeholder="Nhận xét cho tiết mục...">${esc(d.nhanxet)}</textarea>
+    </div>
+
     <div class="total">
       <div>Đã chấm: <strong>${n}/${CRITERIA.length}</strong> tiêu chí</div>
       <button class="btn-main" data-done ${n < CRITERIA.length ? "disabled" : ""}>Hoàn tất</button>
@@ -467,8 +494,34 @@ function renderForm() {
 }
 
 function renderJudge() {
-  if (!state.judge) return `<div class="msg">Vui lòng chọn tên giám khảo ở góc trên.</div>`;
+  if (!state.judge) return renderLogin();
   return state.perf == null ? renderList() : renderForm();
+}
+
+function login() {
+  const v = ($("#jname")?.value || "").trim();
+  if (!v) { toast("Vui lòng nhập tên"); return; }
+  state.judge = "gk_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  state.judgeName = v;
+  localStorage.setItem("judge_id", state.judge);
+  localStorage.setItem("judge_name", v);
+  render();
+}
+
+// Đổi tên: giữ nguyên mã giám khảo, cập nhật tên trong các điểm đã lưu
+function rename() {
+  const v = (prompt("Nhập tên mới:", state.judgeName) || "").trim();
+  if (!v || v === state.judgeName) return;
+  state.judgeName = v;
+  localStorage.setItem("judge_name", v);
+  Object.keys(state.all).forEach(pid => {
+    const e = state.all[pid]?.[state.judge];
+    if (e) write(pid, state.judge, { ...e, judgeName: v }).catch(err => {
+      console.error(err); toast("Lỗi đổi tên");
+    });
+  });
+  toast("✔ Đã đổi tên");
+  render();
 }
 
 function openPerf(id) {
@@ -502,13 +555,15 @@ function addNote(key) {
    5. GIAO DIỆN THƯ KÝ (TỔNG HỢP)
    ========================================================= */
 function computeRows() {
+  const jm = judgesMap();
+  const ids = Object.keys(jm);
   const rows = PERFORMANCES.map(p => {
-    const per = JUDGES.map(j => ({ ...j, e: state.all[p.id]?.[j.id] || null }));
+    const per = ids.map(id => ({ id, name: jm[id], e: state.all[p.id]?.[id] || null }));
     const done = per.filter(x => totalOf(x.e) != null);
     const avg = done.length ? done.reduce((a, x) => a + totalOf(x.e), 0) / done.length : null;
     const crit = {};
     CRITERIA.forEach(c => {
-      const ss = done.map(x => x.e.c[c.key].s);
+      const ss = done.map(x => x.e.c?.[c.key]?.s).filter(v => v != null);
       crit[c.key] = ss.length ? ss.reduce((a, b) => a + b, 0) / ss.length : null;
     });
     return { p, per, done, avg, crit };
@@ -516,7 +571,7 @@ function computeRows() {
   rows.forEach(r => {
     r.rank = r.avg == null ? null : 1 + rows.filter(o => o.avg != null && o.avg > r.avg).length;
   });
-  return rows;
+  return { rows, ids, jm };
 }
 
 function renderAdmin() {
@@ -525,7 +580,8 @@ function renderAdmin() {
     if (pin !== ADMIN_PIN) { location.hash = ""; return ""; }
     state.adminOK = true;
   }
-  const rows = computeRows();
+  const { rows, ids } = computeRows();
+  const N = ids.length;
   const sorted = [...rows].sort((a, b) => (b.avg ?? -1) - (a.avg ?? -1) || a.p.id - b.p.id);
   const top3 = sorted.filter(r => r.avg != null).slice(0, 3);
   const medals = [["🥇", "#facc15"], ["🥈", "#cbd5e1"], ["🥉", "#fb923c"]];
@@ -551,42 +607,48 @@ function renderAdmin() {
       ${CRITERIA.map(c => `<td>${fmt(r.crit[c.key])}</td>`).join("")}
       <td class="tot">${fmt(r.avg)}</td>
       <td>${r.avg == null ? "—" : badge(bandOf(Math.round(r.avg)))}</td>
-      <td>${r.done.length}/${JUDGES.length}${r.done.length && r.done.length < JUDGES.length
+      <td>${r.done.length}/${N}${r.done.length && r.done.length < N
         ? `<div class="partial">chưa đủ</div>` : ""}</td>
     </tr>`).join("");
 
-  const details = rows.map(r => `
+  const details = rows.map(r => {
+    const withData = r.per.filter(x => x.e);
+    return `
     <details>
-      <summary>#${r.p.id} · ${esc(r.p.title)} — TB ${fmt(r.avg)}/${MAX_SCORE}${r.per.some(x => x.e?.solo) ? " · cá nhân" : ""}</summary>
-      ${r.per.map(x => {
+      <summary>#${r.p.id} · ${esc(r.p.title)} — TB ${fmt(r.avg)}/${MAX_SCORE}${withData.some(x => x.e.solo) ? " · cá nhân" : ""}</summary>
+      ${withData.length ? withData.map(x => {
         const t = totalOf(x.e);
         const n = scoresOf(x.e).filter(v => v != null).length;
         const head = t != null
           ? `${fmt(t)}/${MAX_SCORE} ${badge(bandOf(Math.round(t)))}`
-          : (x.e ? `<span class="partial">Chưa đủ: ${n}/${CRITERIA.length} tiêu chí</span>` : `<span class="sub">Chưa chấm</span>`);
+          : `<span class="partial">Chưa đủ: ${n}/${CRITERIA.length} tiêu chí</span>`;
         const scoreLine = CRITERIA.map(c =>
-          `<span class="cs">${esc(c.name)}: <b>${x.e?.c?.[c.key]?.s ?? "—"}</b></span>`).join("");
+          `<span class="cs">${esc(c.name)}: <b>${x.e.c?.[c.key]?.s ?? "—"}</b></span>`).join("");
         const notesLines = CRITERIA.map(c => {
-          const list = toArr(x.e?.c?.[c.key]?.n);
+          const list = toArr(x.e.c?.[c.key]?.n);
           if (!list.length) return "";
           return `<div class="nh">${esc(c.name)}</div>
             <ul class="nlist">${list.map(n => `<li class="${n.d ? "done" : ""}">${n.d ? "☑" : "☐"} ${esc(n.t)}</li>`).join("")}</ul>`;
         }).join("");
         return `
           <div class="jrow">
-            <div class="head"><b>${esc(x.name)}${x.e?.solo ? " · cá nhân" : ""}</b><span>${head}</span></div>
+            <div class="head"><b>${esc(x.name)}${x.e.solo ? " · cá nhân" : ""}</b><span>${head}</span></div>
             <div>${scoreLine}</div>
-            ${x.e?.nhanxet ? `<em>“${esc(x.e.nhanxet)}”</em>` : ""}
+            ${x.e.nhanxet ? `<em>“${esc(x.e.nhanxet)}”</em>` : ""}
             ${notesLines}
           </div>`;
-      }).join("")}
-    </details>`).join("");
+      }).join("") : `<div class="sub" style="margin-top:8px">Chưa có giám khảo nào chấm.</div>`}
+    </details>`;
+  }).join("");
 
   return `
     ${podium}
     <div class="toolbar">
       <h2>Tổng hợp điểm</h2>
-      <button class="btn-sec" data-export>⬇ Xuất CSV</button>
+      <div class="tbtns">
+        <button class="btn-sec" data-export>⬇ Xuất CSV</button>
+        <button class="btn-danger" data-reset>🗑 Reset bảng điểm</button>
+      </div>
     </div>
     <div class="table-wrap">
       <table>
@@ -603,9 +665,9 @@ function renderAdmin() {
 }
 
 function exportCSV() {
-  const rows = computeRows();
+  const { rows, ids, jm } = computeRows();
   const header = ["Hạng", "STT", "Tiết mục", "Tác giả", ...CRITERIA.map(c => c.name + " (TB)"),
-                  "TB /20", "Xếp loại", "Số GK đủ điểm", ...JUDGES.map(j => j.name + " (điểm TB)")];
+                  "TB /20", "Xếp loại", "Số GK đủ điểm", ...ids.map(id => jm[id] + " (điểm)")];
   const lines = rows.map(r => [
     r.rank ?? "", r.p.id, r.p.title, r.p.sub,
     ...CRITERIA.map(c => fmt(r.crit[c.key])),
@@ -622,6 +684,25 @@ function exportCSV() {
   a.click();
 }
 
+// Reset bảng điểm: yêu cầu mật khẩu reset và xác nhận lần cuối
+function resetAll() {
+  const pin = prompt("Nhập mật khẩu reset để xóa TOÀN BỘ điểm và ghi chú:");
+  if (pin === null) return;
+  if (pin !== RESET_PIN) { toast("Sai mật khẩu, chưa reset"); return; }
+  if (!confirm("Xóa toàn bộ điểm, nhận xét và ghi chú của tất cả giám khảo? Không thể khôi phục.")) return;
+
+  const done = () => { toast("✔ Đã reset bảng điểm"); render(); };
+  if (useFirebase) {
+    db.ref("entries").remove().then(done).catch(err => {
+      console.error(err); toast("Lỗi reset, thử lại");
+    });
+  } else {
+    localStorage.removeItem(LOCAL_KEY);
+    window.dispatchEvent(new Event("local-save"));
+    done();
+  }
+}
+
 /* =========================================================
    6. GIAO DIỆN & ĐIỀU KHIỂN CHUNG
    ========================================================= */
@@ -634,97 +715,10 @@ function setTheme(t) {
 
 function render() {
   const isAdmin = location.hash === "#admin";
-  $("#judgeSel").style.display = isAdmin ? "none" : "";
   $("header h1").textContent = isAdmin ? "📊 Thư ký — Tổng hợp" : "🏆 Chấm điểm cuộc thi";
   $("#adminLink").textContent = isAdmin ? "← Giám khảo" : "Tổng hợp";
   $("#adminLink").href = isAdmin ? "#" : "#admin";
+  $("#who").hidden = isAdmin || !state.judge;
+  $("#whoName").textContent = state.judgeName;
   $("#view").innerHTML = isAdmin ? renderAdmin() : renderJudge();
-}
-
-document.addEventListener("click", e => {
-  const t = e.target;
-
-  const open = t.closest("[data-open]");
-  if (open) return openPerf(Number(open.dataset.open));
-
-  if (t.closest("[data-back]")) return closeForm();
-
-  const sc = t.closest("[data-crit]");
-  if (sc) return setScore(sc.dataset.crit, Number(sc.dataset.score));
-
-  const add = t.closest("[data-addnote]");
-  if (add) return addNote(add.dataset.addnote);
-
-  const tg = t.closest("[data-togglenote]");
-  if (tg) {
-    const [key, j] = tg.dataset.togglenote.split(":");
-    const item = state.draft.c[key].n[Number(j)];
-    item.d = !item.d;
-    persist(); render(); return;
-  }
-
-  const dn = t.closest("[data-delnote]");
-  if (dn) {
-    const [key, j] = dn.dataset.delnote.split(":");
-    state.draft.c[key].n.splice(Number(j), 1);
-    persist(); render(); return;
-  }
-
-  if (t.closest("[data-done]")) {
-    if (totalOf(state.draft) == null) return;
-    persist();
-    toast("✔ Đã lưu đầy đủ điểm");
-    closeForm(); return;
-  }
-
-  if (t.closest("[data-export]")) exportCSV();
-});
-
-// Cập nhật bản nháp khi gõ (không render lại để khỏi mất con trỏ)
-document.addEventListener("input", e => {
-  const id = e.target.id;
-  if (id === "nx") state.draft.nhanxet = e.target.value;
-  if (e.target.dataset.noteinput) state.noteIn[e.target.dataset.noteinput] = e.target.value;
-});
-
-document.addEventListener("change", e => {
-  if (e.target.id === "nx") persist();
-  if (e.target.id === "soloChk") {
-    state.draft.solo = e.target.checked;
-    persist(); render();
-  }
-});
-
-document.addEventListener("keydown", e => {
-  if (e.key === "Enter" && e.target.dataset.noteinput) {
-    e.preventDefault();
-    addNote(e.target.dataset.noteinput);
-  }
-});
-
-$("#judgeSel").addEventListener("change", e => {
-  state.judge = e.target.value;
-  localStorage.setItem("judge_id", state.judge);
-  state.perf = null; state.draft = null; state.noteIn = {};
-  render();
-});
-
-$("#themeSel").addEventListener("change", e => setTheme(e.target.value));
-
-window.addEventListener("hashchange", () => {
-  state.adminOK = state.adminOK && location.hash === "#admin";
-  render();
-});
-
-/* =========================================================
-   7. KHỞI ĐỘNG
-   ========================================================= */
-$("#banner").hidden = useFirebase;
-renderJudgeSelect();
-setTheme(localStorage.getItem("theme") || "tuong-phan");
-
-listen(all => { state.all = all || {}; softRender(); });
-render();
-</script>
-</body>
-</html>
+  if (!isAdmin && !state.judge) $("#jname")?.focus();
